@@ -30,7 +30,7 @@ let string_rev (s : string) : string =
 (* recursive step *)
     else (reverse (x - 1))^(String.make 1 s.[x])
 (* initialize x value *)
-  in reverse (String.length s)
+  in reverse ((String.length s) - 1)
 
 let _ = assert (string_rev "testing" = "gnitset")
 let _ = assert (string_rev "12345" = "54321")
