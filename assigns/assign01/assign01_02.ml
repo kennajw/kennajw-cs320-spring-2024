@@ -15,4 +15,10 @@
  *)
 
 let is_perfect (n : int) : bool =
-  assert false (* REMOVE THIS LINE AND FILL IN YOUR SOLUTION *)
+  let rec prop_divs (n : int) : int =
+    let i = 0 in
+    if i = n then 0
+    else if (i mod n) = 0 then i + prop_divs(i - 1)
+    else prop_divs(i - 1)
+  in prop_divs n
+  if (prop_divs n) = n then true else false
