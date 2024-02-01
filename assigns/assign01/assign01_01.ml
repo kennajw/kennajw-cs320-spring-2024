@@ -28,7 +28,7 @@ let string_rev (s : string) : string =
 (* base case *)
     then "" 
 (* recursive step *)
-    else (reverse (x - 1))^(String.make 1 s.[x])
+    else (String.make 1 s.[x]^(reverse (x - 1)))
 (* initialize x value *)
   in reverse ((String.length s) - 1)
 
