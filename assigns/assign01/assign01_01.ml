@@ -23,8 +23,10 @@
 
 let string_rev (s : string) : string =
   let rec reverse x =
-    if x >= String.length s then "" else (reverse (x + 1))^(String.make 1 s.[x])
-  in reverse 0
+    if x >= String.length s 
+    then "" 
+    else (reverse (x + 1))^(String.make 1 s.[x])
+  in reverse 1
 
 let _ = assert (string_rev "testing" = "gnitset")
 let _ = assert (string_rev "12345" = "54321")
