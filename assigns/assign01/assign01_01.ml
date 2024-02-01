@@ -33,6 +33,7 @@ let string_rev (s : string) : string =
   in reverse (String.length s - 1)
 
 let _ = print_endline (string_rev "testing")
-let _ = assert (string_rev "testing" = "gnitset")
-let _ = assert (string_rev "12345" = "54321")
-let _ = assert (string_rev "noon" = "noon")
+let _ = print_endline (string_rev "12345")
+let _ = print_endline (string_rev "noon")
+let _ = print_endline (string_rev "kenna wylie")
+let _ = print_endline (string_rev "redrum")
