@@ -24,7 +24,7 @@
 let string_rev (s : string) : string =
 (* needs a recursive func to solve *)
   let rec reverse (x : int) : string =
-    if x = 0
+    if x <= 0
 (* base case *)
     then "" 
 (* recursive step *)
