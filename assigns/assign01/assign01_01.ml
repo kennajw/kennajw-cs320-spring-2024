@@ -22,11 +22,15 @@
  *)
 
 let string_rev (s : string) : string =
-  let rec reverse x =
-    if x >= String.length s 
+(* needs a recursive func to solve *)
+  let rec reverse (x : int) : string =
+    if x = 0
+(* base case *)
     then "" 
-    else (reverse (x + 1))^(String.make 1 s.[x])
-  in reverse 1
+(* recursive step *)
+    else (reverse (x - 1))^(String.make 1 s.[x])
+(* initialize x value *)
+  in reverse (String.length s)
 
 let _ = assert (string_rev "testing" = "gnitset")
 let _ = assert (string_rev "12345" = "54321")
