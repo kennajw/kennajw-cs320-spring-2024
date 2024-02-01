@@ -22,4 +22,6 @@
  *)
 
 let string_rev (s : string) : string =
-  assert false (* REMOVE THIS LINE AND FILL IN YOUR SOLUTION *)
+  let rec reverse x =
+    if x >= String.length s then "" else (reverse (x + 1))^(String.make 1 s.[x])
+  in reverse 0    
