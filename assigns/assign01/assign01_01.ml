@@ -27,13 +27,7 @@ let string_rev (s : string) : string =
     if x = -1
 (* base case *)
     then "" 
-(* recursive step *)
+(* recursive step: concat string of current character and the recurse on string w/out that character *)
     else (String.make 1 s.[x]^(reverse (x - 1)))
-(* initialize x value *)
+(* initialize x value to last index *)
   in reverse (String.length s - 1)
-
-let _ = print_endline (string_rev "testing")
-let _ = print_endline (string_rev "12345")
-let _ = print_endline (string_rev "noon")
-let _ = print_endline (string_rev "kenna wylie")
-let _ = print_endline (string_rev "redrum")
