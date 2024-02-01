@@ -24,13 +24,13 @@
 let string_rev (s : string) : string =
 (* needs a recursive func to solve *)
   let rec reverse (x : int) : string =
-    if x <= 0
+    if x = 0
 (* base case *)
     then "" 
 (* recursive step *)
     else (String.make 1 s.[x]^(reverse (x - 1)))
 (* initialize x value *)
-  in reverse (String.length s - 2)
+  in reverse (String.length s - 1)
 
 let _ = print_endline (string_rev "testing")
 let _ = assert (string_rev "testing" = "gnitset")
