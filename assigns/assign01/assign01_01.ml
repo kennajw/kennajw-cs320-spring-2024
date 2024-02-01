@@ -27,3 +27,5 @@ let string_rev (s : string) : string =
   in reverse 0
 
 let _ = assert (string_rev "testing" = "gnitset")
+let _ = assert (string_rev "12345" = "54321")
+let _ = assert (string_rev "noon" = "noon")
