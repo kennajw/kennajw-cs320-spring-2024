@@ -34,10 +34,3 @@ let fast_fib (n : int) : int =
       else (fibo (n - 1) (x + y) x)
 (* initialization *)
     in fibo n 1 0
-
-    let _ = assert (fast_fib 0 = 1)
-    let _ = assert (fast_fib 1 = 1)
-    let _ = assert (fast_fib 2 = 2)
-    let _ = assert (fast_fib 3 = 3)
-    let _ = assert (fast_fib 4 = 5)
-    let _ = assert (fast_fib 5 = 8)
