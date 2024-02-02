@@ -17,4 +17,12 @@
  *)
 
 let taxicab (n : int) : int =
-  assert false (* REMOVE THIS LINE AND FILL IN YOUR SOLUTION *)
+  let rec taxi n x y : int = 
+    if (x * x * x) >= n || (y * y * y) >= n
+      then 0
+    else if ((x * x * x) + (y * y * y)) = n
+      then 1 + taxi n 2 1
+    else if x = y
+      then taxi n x (y + 1)
+    else taxi n (x + 1) (y + 1)
+  in taxi n 1 1
