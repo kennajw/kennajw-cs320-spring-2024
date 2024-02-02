@@ -46,6 +46,10 @@ let block_text (s : string) (min_width : int) (max_width : int) : string =
     else (String.sub s 0 (max_width - 1)) ^ "\n" ^ block (String.sub s (max_width - 1) (String.length s - max_width)) min_width max_width
   in block s min_width max_width
 
+  let _ = print_string (block_text "ABCDEFGHIJ" 0 3)
+  let _ = print_string (block_text "ABCDEFGHIJ" 2 3)
+  let _ = print_string (block_text "ABCDEFGHIJ" 0 4)
+  let _ = print_string (block_text "ABCDEFGHIJ" 3 4)
   let _ = assert (block_text "ABCDEFGHIJ" 0 3 = "ABC\nDEF\nGHI\nJ")
   let _ = assert (block_text "ABCDEFGHIJ" 2 3 = "AB\nCD\nEF\nGH\nIJ")
   let _ = assert (block_text "ABCDEFGHIJ" 0 4 = "ABCD\nEFGH\nIJ")
