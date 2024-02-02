@@ -30,9 +30,15 @@ let fast_fib (n : int) : int =
       else fibo n (x + y) x
     in fibo n 1 1
 
-    let _ = assert (fast_fib 0 = 1)
-    let _ = assert (fast_fib 1 = 1)
-    let _ = assert (fast_fib 2 = 2)
-    let _ = assert (fast_fib 3 = 3)
-    let _ = assert (fast_fib 4 = 5)
-    let _ = assert (fast_fib 5 = 8)
+let _ = print_int (fast_fib 2)
+let _ = print_int (fast_fib 0)
+let _ = print_int (fast_fib 1)
+let _ = print_int (fast_fib 3)
+let _ = print_int (fast_fib 4)
+let _ = print_int (fast_fib 5)
+let _ = assert (fast_fib 0 = 1)
+let _ = assert (fast_fib 1 = 1)
+let _ = assert (fast_fib 2 = 2)
+let _ = assert (fast_fib 3 = 3)
+let _ = assert (fast_fib 4 = 5)
+let _ = assert (fast_fib 5 = 8)
