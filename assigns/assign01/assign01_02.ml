@@ -15,10 +15,13 @@
  *)
 
 let is_perfect (n : int) : bool =
-  let rec prop_divs (n : int) : int =
-    let i = 0 in
-    if i = n then 0
-    else if (i mod n) = 0 then i + prop_divs(i - 1)
-    else prop_divs(i - 1)
-  in prop_divs n
-  if (prop_divs n) = n then true else false
+  let rec prop_divs_sum (n : int) (x : int) : int =
+    if x = 1
+      then 1
+    else if (n mod x) = 0
+      then (x + prop_divs_sum n (x - 1))
+    else prop_divs_sum n (x - 1)
+  in prop_divs_sum n (n - 1);
+  if prop_divs_sum n (n - 1) = n
+    then true
+  else false
