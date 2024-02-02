@@ -50,10 +50,10 @@ let block_text (s : string) (min_width : int) (max_width : int) : string =
     else 
       let start : string = (String.sub s 0 wid) in
       start ^ String.make 1 '\n' ^ block (String.sub s (wid) (String.length s - wid)) wid
-  in block s wid
+  in block s 2
 
-  let _ = print_string (block_text "ABCDEFGHIJ" 0 3)
-  (*let _ = print_string (block_text "ABCDEFGHIJ" 2 3)*)
+  (*let _ = print_string (block_text "ABCDEFGHIJ" 0 3)*)
+  let _ = print_string (block_text "ABCDEFGHIJ" 2 3)
   let _ = print_string (block_text "ABCDEFGHIJ" 0 4)
   let _ = print_string (block_text "ABCDEFGHIJ" 3 4)
   let _ = assert (block_text "ABCDEFGHIJ" 0 3 = "ABC\nDEF\nGHI\nJ")
