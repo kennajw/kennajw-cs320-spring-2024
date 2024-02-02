@@ -53,7 +53,7 @@ let block_text (s : string) (min_width : int) (max_width : int) : string =
   in block s wid
 
   let _ = print_string (block_text "ABCDEFGHIJ" 0 3)
-  let _ = print_string (block_text "ABCDEFGHIJ" 2 3)
+  (*let _ = print_string (block_text "ABCDEFGHIJ" 2 3)*)
   let _ = print_string (block_text "ABCDEFGHIJ" 0 4)
   let _ = print_string (block_text "ABCDEFGHIJ" 3 4)
   let _ = assert (block_text "ABCDEFGHIJ" 0 3 = "ABC\nDEF\nGHI\nJ")
