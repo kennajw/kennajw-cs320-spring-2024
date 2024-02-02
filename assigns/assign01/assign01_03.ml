@@ -25,17 +25,17 @@
 
 let fast_fib (n : int) : int =
   let rec fibo n x y : int =
-    if n = 0 || n = 1 
-      then 1
-      else (fibo (n - 1) y (x + y))
-    in fibo n 1 1
+    if n <= 0 || n = 1
+      then y
+      else (fibo (n - 1) (x + y) y)
+    in fibo n 1 0
 
-(*let _ = print_int (fast_fib 2)
+let _ = print_int (fast_fib 2)
 let _ = print_int (fast_fib 0)
 let _ = print_int (fast_fib 1)
 let _ = print_int (fast_fib 3)
 let _ = print_int (fast_fib 4)
-let _ = print_int (fast_fib 5)*)
+let _ = print_int (fast_fib 5)
 let _ = assert (fast_fib 0 = 1)
 let _ = assert (fast_fib 1 = 1)
 let _ = assert (fast_fib 2 = 2)
