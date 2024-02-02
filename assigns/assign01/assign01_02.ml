@@ -25,3 +25,7 @@ let is_perfect (n : int) : bool =
   if prop_divs_sum n (n - 1) = n
     then true
   else false
+
+  let _ = assert (is_perfect 6)        (* 1 + 2 + 3 = 6 *)
+  let _ = assert (is_perfect 28)       (* 1 + 2 + 4 + 7 + 14 = 28 *)
+  let _ = assert (not (is_perfect 24))
