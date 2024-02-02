@@ -38,20 +38,20 @@
  *)
 
 let block_text (s : string) (min_width : int) (max_width : int) : string =
-  let rec width (s : string) (min_width : int) (max_width : int) : int =
+  (*let rec width (s : string) (min_width : int) (max_width : int) : int =
     if min_width = 0
       then max_width
     else if (String.length s mod max_width) >= min_width
       then max_width
     else width s min_width (max_width - 1)
   in width s min_width max_width;
-  let wid : int = width s min_width max_width in
+  let wid : int = width s min_width max_width in*)
   let rec block (s : string) (wid : int) : string =
     if String.length s < wid
       then s
     else 
       let start : string = (String.sub s 0 wid) in
-      start ^ String.make 1 '\n' ^ block (String.sub s (wid) (String.length s - wid)) wid
+      start ^ String.make 1 '\n' ^ block (String.sub s wid (String.length s - wid)) wid
   in block s 2
 
   (*let _ = print_string (block_text "ABCDEFGHIJ" 0 3)*)
