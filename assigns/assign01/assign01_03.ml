@@ -35,12 +35,6 @@ let fast_fib (n : int) : int =
 (* initialization *)
     in fibo n 1 0
 
-    let _ = print_int (fast_fib 2)
-    let _ = print_int (fast_fib 0)
-    let _ = print_int (fast_fib 1)
-    let _ = print_int (fast_fib 3)
-    let _ = print_int (fast_fib 4)
-
     let _ = assert (fast_fib 0 = 1)
     let _ = assert (fast_fib 1 = 1)
     let _ = assert (fast_fib 2 = 2)
