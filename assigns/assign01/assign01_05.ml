@@ -39,7 +39,7 @@
 
 let block_text (s : string) (min_width : int) (max_width : int) : string =
   let rec width (s : string) (min_width : int) (max_width : int) : int =
-    if (String.length s mod max_width) >= min_width
+    if (String.length s mod max_width) >= min_width || min_width = 0
       then max_width
     else width s min_width (max_width - 1)
   in width s min_width max_width;
