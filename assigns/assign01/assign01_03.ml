@@ -29,7 +29,7 @@ let fast_fib (n : int) : int =
 (* since we know fib(0) and fib(1) already equate to, they are the base case *)
     if n <= 0 || n = 1
 (* base case *)
-      then y
+      then 1
 (* tail-recursive implementation with only one function call that will recurse from n to 1 *)
       else (fibo (n - 1) (x + y) y)
 (* initialization *)
