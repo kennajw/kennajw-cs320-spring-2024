@@ -26,3 +26,8 @@ let taxicab (n : int) : int =
       then taxi n x (y + 1)
     else taxi n (x + 1) (y + 1)
   in taxi n 1 1
+
+  let _ = assert (taxicab 2 = 1)
+  let _ = assert (taxicab 5 = 0)
+  let _ = assert (taxicab 1729 = 2)   (* 1729 = 1^3 + 12^3 = 3^3 + 9^3 *)
+  let _ = assert (taxicab 4104 = 2)   (* 4104 = 2^3 + 16^3 = 9^3 + 15^3 *)
