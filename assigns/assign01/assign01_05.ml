@@ -48,7 +48,7 @@ let block_text (s : string) (min_width : int) (max_width : int) : string =
       start ^ String.make 1 '\n' ^ block (String.sub s (max_width) (String.length s - max_width)) min_width max_width
   in block s min_width max_width
 
-  let _ = print_string (block_text "ABCDEFGHIJ" 0 3)
+  (*let _ = print_string (block_text "ABCDEFGHIJ" 0 3)*)
   let _ = print_string (block_text "ABCDEFGHIJ" 2 3)
   let _ = print_string (block_text "ABCDEFGHIJ" 0 4)
   let _ = print_string (block_text "ABCDEFGHIJ" 3 4)
