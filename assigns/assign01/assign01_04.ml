@@ -21,7 +21,7 @@ let taxicab (n : int) : int =
     if (x * x * x) >= n || (y * y * y) >= n
       then 0
     else if ((x * x * x) + (y * y * y)) = n
-      then 1 + taxi n 2 1
+      then 1 + taxi n (x + 1) 1
     else if x = y
       then taxi n (x + 1) 1
     else taxi n x (y + 1)
