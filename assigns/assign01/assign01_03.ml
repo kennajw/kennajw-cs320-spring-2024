@@ -26,7 +26,7 @@
 let fast_fib (n : int) : int =
   let rec fibo n x y : int =
     if n = 0 || n = 1 
-      then x 
+      then 1
       else fibo n (x + y) x
     in fibo n 1 1
 
