@@ -22,6 +22,8 @@ type int_or_string
   = Int of int
   | String of string
 
-let convert (l : int_or_string list) : int_list_or_string_list list =
+let rec convert (l : int_or_string list) : int_list_or_string_list list =
   match l with
-  | Int -> l :: 
+  | [] -> []
+  | Int h :: t -> IntList h :: convert t
+  | String h :: t -> StringList h :: convert t
