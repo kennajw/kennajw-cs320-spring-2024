@@ -25,5 +25,5 @@ type int_or_string
 let rec convert (l : int_or_string list) : int_list_or_string_list list =
   match l with
   | [] -> []
-  | Int h :: t -> IntList h :: convert t
-  | String h :: t -> StringList h :: convert t
+  | Int h :: t -> h ::  convert t
+  | String h :: t -> h :: convert t
