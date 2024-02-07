@@ -23,4 +23,5 @@ type int_or_string
   | String of string
 
 let convert (l : int_or_string list) : int_list_or_string_list list =
-  assert false (* TODO *)
+  match l with
+  | Int -> l :: 
