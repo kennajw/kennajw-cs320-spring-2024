@@ -56,17 +56,17 @@ let add_dir (dir : dir) (step : int) (l : (dir * int) list list) =
     in add l
 
 let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
-  let rec path (sp : point) (ep : point)  l =
+  let rec path l (sp : point) (ep : point)  =
     if l <= 0 && sp = ep
      then [[]]
     else if l = 1 && sp = ep
       then []
     else
-        (add_dir N 1 (path {x = sp.x; y = sp.y + 1} (ep) (l - 1))) @
-        (add_dir S 1 (path {x = sp.x; y = sp.y - 1} (ep) (l - 1))) @
-        (add_dir E 1 (path {x = sp.x + 1; y = sp.y} (ep) (l - 1))) @
-        (add_dir W 1 (path {x = sp.x - 1; y = sp.y} (ep) (l - 1)))
-  in path stp endp len
+        (add_dir N 1 (path (l - 1) {x = sp.x; y = sp.y + 1} (ep))) @
+        (add_dir S 1 (path (l - 1) {x = sp.x; y = sp.y - 1} (ep))) @
+        (add_dir E 1 (path (l - 1) {x = sp.x + 1; y = sp.y} (ep))) @
+        (add_dir W 1 (path (l - 1) {x = sp.x - 1; y = sp.y} (ep)))
+  in path len stp endp
 
 let origin = {x=0;y=0}
 let _ = assert (all_paths 0 origin origin = [[]])
