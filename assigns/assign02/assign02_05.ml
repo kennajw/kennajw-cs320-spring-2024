@@ -47,4 +47,8 @@ type point = {
 }
 
 let rec all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
-  assert false (* TODO *)
+  if len = 0
+    then [[]]
+  else if len = 1
+    then []
+  else assert false
