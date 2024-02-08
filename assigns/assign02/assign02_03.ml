@@ -54,8 +54,16 @@ type user = {
   recent_posts : post list ;
 }
 
-let update_recent (u : user) (time : int) (stale : int) : user =
-  assert false (* TODO *)
+let rec update_recent (u : user) (time : int) (stale : int) : user =
+  let recp = u.recent_posts in
+  match recp with
+  | [] -> u
+  | x :: xs ->
+    if x.timestamp < stale
+      then assert false
+    else assert false
+
+
 
 let p t = {title="";content="";timestamp=t}
 let mk op rp = {
