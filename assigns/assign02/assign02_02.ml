@@ -29,16 +29,24 @@ type recipe = {
   ingrs : ingr list;
 }
 
+let rec check_ingrs (y : ingr list) (s : ingr list) : bool =
+  match y with
+  | [] -> true
+  | a :: b ->
+    if List.mem a s != true
+      then false
+    else check_ingrs b s;
+in check_ingrs y s
+
 let recs_by_ingrs (l : recipe list) (s : ingr list) : recipe list =
-  let rec find_rec (r : recipe list) =
-    match r with
+  let rec find_rec (l : recipe list) =
+    match l with
     | [] -> []
     | x :: xs -> 
-      if List.mem x.ingrs [s] = true
-        then x :: find_rec xs
-      else
-        find_rec xs
-  in find_rec l
+      if check_ingrs x.ingrs s = true
+        then x :: find_rec xs 
+      else find_rec xs
+  in find_rec l;
 
 let r1 = { name = "1" ; ingrs = ["a"; "b"; "d"] }
 let r2 = { name = "2" ; ingrs = ["a"; "c"; "e"] }
