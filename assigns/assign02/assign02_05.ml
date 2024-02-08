@@ -57,7 +57,6 @@ let add_dir (dir : dir) (step : int) (l : (dir * int) list list) =
 
 let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
   let rec path (sp : point) (ep : point)  l =
-    let _ = print_int l in
     if l = 0 && sp = ep
      then [[]]
     else if l = 1 && sp = ep
