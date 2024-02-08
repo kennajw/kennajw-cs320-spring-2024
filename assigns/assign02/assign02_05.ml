@@ -50,9 +50,9 @@ let add_dir (dir : dir) (step : int) (l : (dir * int) list list) =
   let rec add l =
     match l with
     | [] -> []
-    | x :: xs ->
-      let current_dir = (dir, step) :: x in
-      current_dir :: add xs
+    | x :: xs -> ((dir, step) :: x) :: add xs
+      (*let current_dir = (dir, step) :: x in
+      current_dir :: add xs*)
     in add l
 
 let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
