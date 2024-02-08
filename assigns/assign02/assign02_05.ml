@@ -46,9 +46,12 @@ type point = {
   y : int ;
 }
 
-let rec all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
-  if len = 0
-    then [[]]
-  else if len = 1
-    then []
-  else assert false
+let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
+  let rec path sp ep l =
+    if len = 1 && sp = ep
+     then []
+    else 
+      match l with
+      | 0 -> [[]]
+      | n -> assert false
+  in path stp endp len
