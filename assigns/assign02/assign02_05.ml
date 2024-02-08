@@ -70,6 +70,8 @@ let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
   in path stp endp len
 
 let origin = {x=0;y=0}
+let _ = assert (all_paths 0 origin origin = [[]])
+let _ = assert (all_paths 1 origin origin = [])
 let _ = assert (all_paths 2 origin origin =
   [[(N,1);(S,1)] ;
    [(S,1);(N,1)] ;
