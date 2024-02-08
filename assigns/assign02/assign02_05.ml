@@ -62,11 +62,10 @@ let all_paths (len : int) (stp : point) (endp : point) : (dir * int) list list =
     else if l = 1 && sp = ep
       then []
     else
-        let n = (add_dir N 1 (path (l - 1) {x = sp.x; y = sp.y + 1} (ep))) in
-        let s = (add_dir S 1 (path (l - 1) {x = sp.x; y = sp.y - 1} (ep))) in
-        let e = (add_dir E 1 (path (l - 1) {x = sp.x + 1; y = sp.y} (ep))) in
-        let w = (add_dir W 1 (path (l - 1) {x = sp.x - 1; y = sp.y} (ep))) in
-        n @ s @ e @ w
+        (add_dir N 1 (path (l - 1) {x = sp.x; y = sp.y + 1} (ep))) @
+        (add_dir S 1 (path (l - 1) {x = sp.x; y = sp.y - 1} (ep))) @
+        (add_dir E 1 (path (l - 1) {x = sp.x + 1; y = sp.y} (ep))) @
+        (add_dir W 1 (path (l - 1) {x = sp.x - 1; y = sp.y} (ep))) 
   in path len stp endp
 
 let origin = {x=0;y=0}
