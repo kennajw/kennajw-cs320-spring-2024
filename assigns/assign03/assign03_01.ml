@@ -28,10 +28,7 @@ type 'a concatlist
 let sort (l : 'a concatlist) : 'a list =
   let rec sorting (lst : 'a concatlist) : 'a list =
     match lst with
-    | Nil
-    | Single _ -> assert false
-    | Concat (x ,xs) -> 
-      if x > xs
-        then x :: sorting xs
-      else xs :: sorting x
+    | Nil -> []
+    | Single x -> [x]
+    | Concat(x, xs) -> assert false
   in sorting l
