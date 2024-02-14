@@ -25,10 +25,14 @@ type 'a concatlist
   | Single of 'a
   | Concat of 'a concatlist * 'a concatlist
 
+let mergesort l1 l2 =
+  let rec merge a b =
+    assert false (*merge sort function to be implemented (traditional merge sort)*)
+  in merge l1 l2
 let sort (l : 'a concatlist) : 'a list =
   let rec sorting (lst : 'a concatlist) : 'a list =
     match lst with
     | Nil -> []
     | Single x -> [x]
-    | Concat(x, xs) -> assert false
+    | Concat(x, xs) -> assert false (*split x and xs and perform merge sort on each; IMPLEMENT LATER*)
   in sorting l
