@@ -49,15 +49,17 @@ let funfork a b c =
   in fork a b c
 
 let funcons a b =
-  let cons x xs =
-    match x xs with
-    | _, _ -> assert false
-  in cons a b
+  let rec con x s =
+    match x, s with
+    | x, Nil -> x, Nil
+    | x, Cons (_, _) -> assert false
+    | x, Fork(s, _, _) -> Cons(x, Fork(s))
+  in con a b
 
 let delay_cons (f : int forklist) : int forklist =
   let rec delay lst =
     match lst with
     | Nil -> Nil
-    | Cons (x, xs) -> assert false
+    | Cons (x, xs) -> funcons x (delay xs)
     | Fork (x, lxs, rxs) -> funfork x (delay lxs) (delay rxs)
   in delay f
