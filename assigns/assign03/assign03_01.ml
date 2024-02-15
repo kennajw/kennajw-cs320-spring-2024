@@ -44,3 +44,6 @@ let sort (l : 'a concatlist) : 'a list =
     | Single x -> [x]
     | Concat(x, xs) -> mergesort (sorting x) (sorting xs) (*split x and xs and perform merge sort on each; IMPLEMENT LATER*)
   in sorting l
+
+  let l = Concat (Concat (Single 3, Single 2), Concat (Single 1, Single 10))
+  let _ = assert (sort l = [1;2;3;10])
