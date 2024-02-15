@@ -43,4 +43,9 @@ type 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
 let delay_cons (f : int forklist) : int forklist =
-  assert false (* TODO *)
+  let rec delay lst =
+    match lst with
+    | Nil -> Nil
+    | Cons (x, xs) -> assert false
+    | Fork (x, xs, xss) -> assert false
+  in delay f
