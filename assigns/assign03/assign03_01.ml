@@ -27,12 +27,20 @@ type 'a concatlist
 
 let mergesort l1 l2 =
   let rec merge a b =
-    assert false (*merge sort function to be implemented (traditional merge sort)*)
+    match a, b with
+    | _, [] -> a
+    | [], _ -> b
+    | a1 :: a2, b1 :: b2 ->
+      if a1 < b1
+        then a1 :: merge a2 (b1 :: b2)
+      else b1 :: merge b2 (a1 :: a2)
+
+    (*assert false merge sort function to be implemented (traditional merge sort)*)
   in merge l1 l2
 let sort (l : 'a concatlist) : 'a list =
   let rec sorting (lst : 'a concatlist) : 'a list =
     match lst with
     | Nil -> []
     | Single x -> [x]
-    | Concat(x, xs) -> assert false (*split x and xs and perform merge sort on each; IMPLEMENT LATER*)
+    | Concat(x, xs) -> mergesort (sorting x) (sorting xs) (*split x and xs and perform merge sort on each; IMPLEMENT LATER*)
   in sorting l

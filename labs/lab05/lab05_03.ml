@@ -16,5 +16,23 @@
 
 type 'a matrix = 'a list list
 
+type error
+  = MismatchDim
+
+let rec dot (v : float list) (u : float list) = (* before adding okay, same except get rid of nested pattern matching*)
+  match v, u with (* extensive error matching is not necessary*)
+  | [], [] -> Ok 0.
+  | x :: xs, y :: ys -> match dot xs ys with
+                        | Ok v -> Ok (x *. y +. v)
+                        | Error msg -> Error msg
+  | _ -> Error MismatchDim (* this is impossible *)
+  (*match v with
+  | [] -> 0.
+  | x :: xs -> match u with
+              | [] -> assert false
+              | y :: ys -> x *. y +. dot xs ys*)
+
 let rec mv_mul (a : float matrix) (v : float list) : float list =
-  assert false (* TODO *)
+  match a with
+  | [] -> []
+  | row :: rows -> dot row v :: mv_mul rows v
