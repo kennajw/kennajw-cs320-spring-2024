@@ -35,8 +35,8 @@ let mergesort l1 l2 =
 (* recursive case where mergesort is performed *)
     | a1 :: a2, b1 :: b2 ->
       if a1 < b1
-        then a1 :: merge a2 (b1 :: b2)
-      else b1 :: merge b2 (a1 :: a2)
+        then a1 :: merge a2 b
+      else b1 :: merge b2 a
   in merge l1 l2
 let sort (l : 'a concatlist) : 'a list =
   let rec sorting (lst : 'a concatlist) : 'a list =
