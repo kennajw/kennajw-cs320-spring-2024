@@ -62,7 +62,24 @@ let eval (v : (string * bool) list) (e : bexp) : bool option =
   let rec evaluate v e =
     match e with
     | Var str -> extractval v str
-    | Not a -> assert false
-    | And (a, b) -> assert false
-    | Or (a, b) -> assert false
+    | Not a -> (
+      let nota = evaluate v a in
+      match nota with
+      | None -> None
+      | Some e1 -> Some (not e1) 
+      )
+    | And (a, b) -> (
+      let anda = evaluate v a in
+      let andb = evaluate v b in
+      match anda, andb with
+      | Some e1, Some e2 -> Some (e1 && e2)
+      | _ -> None 
+      )
+    | Or (a, b) -> (
+      let ora = evaluate v a in
+      let orb = evaluate v b in
+      match ora, orb with
+      | Some e1, Some e2 -> Some (e1 || e2)
+      | _ -> None
+    )
   in evaluate v e
