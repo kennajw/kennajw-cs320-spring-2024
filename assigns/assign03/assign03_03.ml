@@ -48,5 +48,17 @@ type bexp =
   | And of bexp * bexp
   | Or of bexp * bexp
 
+let extractval v s =
+  let rec extract v s =
+    match v with
+    | [] -> None
+    | (a, b) :: c -> assert false
+  in extract v s
 let eval (v : (string * bool) list) (e : bexp) : bool option =
-  assert false (* TODO *)
+  let rec evaluate v e =
+    match e with
+    | Var str -> extractval v str
+    | Not a -> assert false
+    | And (a, b) -> assert false
+    | Or (a, b) -> assert false
+  in evaluate v e
