@@ -46,6 +46,6 @@ let delay_cons (f : int forklist) : int forklist =
   let rec delay lst =
     match lst with
     | Nil -> Nil
-    | Cons (x, xs) -> x (delay xs)
-    | Fork (x, lxs, rxs) -> x (delay lxs) (delay rxs)
+    | Cons (x, xs) -> Cons(x, delay xs)
+    | Fork (x, lxs, rxs) -> Fork(x, delay lxs, delay rxs)
   in delay f
