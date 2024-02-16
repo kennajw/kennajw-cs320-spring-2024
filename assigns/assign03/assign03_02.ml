@@ -42,24 +42,15 @@ type 'a forklist
   | Cons of 'a * 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
-let tailed_cons lst =
-  let rec tailed l =
-    match l with
-    | Nil -> Nil
-    | Cons (x, xs) -> (let tailedxs = tailed xs in
-    match x, tailedxs with
-    | a, Fork (b, c, d) -> Fork(b, Cons(a, c), d)
-    | a, Cons(_, _) -> assert false
-    )
-    | Fork (x, xs, xss) -> assert false
-  in tailed lst
-
-let ordered_cons lst =
-  assert false
-
 let delay_cons (f : int forklist) : int forklist =
-  let _ = ordered_cons (tailed_cons f);
-
-let f = Cons (2, Fork(4, Cons(3, Nil), Cons (5, Nil))) in
-let g = Fork (4, Cons (2, Cons (3, Nil)), Cons(5, Nil)) in
-let _ = assert (delay_cons f = g)
+  let rec delay lst =
+    match lst with
+    | Nil -> Nil
+    | Cons (x, xs) -> (
+      match xs with
+      | Fork (s, sl, sr) -> Fork(s, Cons(x, delay sl), delay sr)
+      | Cons (s, ss) -> Cons (s, delay ss)
+      | Nil -> Cons(x, Nil)
+    )
+    | Fork (x, xs, xss) -> Fork (x, delay xs, delay xss)
+  in delay f
