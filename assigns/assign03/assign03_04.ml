@@ -115,8 +115,22 @@ type 'a matrix = {
   rows : ('a list) list ;
 }
 
+let errorcheck lst =
+  assert false
+
+let rowcount lst =
+  assert false
+
+let colcount lst =
+  assert false
+
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
-  assert false (* TODO *)
+  errorcheck rs;
+  let result = { 
+      num_rows = rowcount rs ;
+      num_cols = colcount rs ;
+      rows = rs ;
+    }
 
 let transpose (m : 'a matrix) : 'a matrix =
   assert false (* TODO *)
