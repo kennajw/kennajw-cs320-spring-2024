@@ -42,24 +42,10 @@ type 'a forklist
   | Cons of 'a * 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
-let funfork a b c =
-  let fork x l r =
-    match x, l, r with
-    | _, _, _ -> assert false
-  in fork a b c
-
-let funcons a b =
-  let rec con x s =
-    match x, s with
-    | x, Nil -> Cons (x, Nil)
-    | x, Cons (s, ss) -> assert false
-    | x, Fork (s, ss, sss) -> Fork (s, Cons(x, ss), sss)
-  in con a b
-
 let delay_cons (f : int forklist) : int forklist =
   let rec delay lst =
     match lst with
     | Nil -> Nil
-    | Cons (x, xs) -> funcons x (delay xs)
-    | Fork (x, lxs, rxs) -> funfork x (delay lxs) (delay rxs)
+    | Cons (x, xs) -> x (delay xs)
+    | Fork (x, lxs, rxs) -> x (delay lxs) (delay rxs)
   in delay f
