@@ -42,31 +42,24 @@ type 'a forklist
   | Cons of 'a * 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
-  let funfork a b c =
-    let fork x l r =
-      match x, l, r with
-      | _, _, _ -> assert false
-    in fork a b c
-  
-  let funcons a b =
-    let rec con x s =
-      match x, s with
-      | x, Nil -> Cons (x, Nil)
-      | x, Cons (s, ss) -> 
-        if s < ss
-          then Cons (s, ss)
-        else Cons (ss, s)
-      | x, Fork (s, ss, sss) -> Fork (s, Cons(x, ss), sss)
-    in con a b
+let tailed_cons lst =
+  let rec tailed l =
+    match l with
+    | Nil -> Nil
+    | Cons (x, xs) -> (let tailedxs = tailed xs in
+    match x, tailedxs with
+    | a, Fork (b, c, d) -> Fork(b, Cons(a, c), d)
+    | a, Cons(_, _) -> assert false
+    )
+    | Fork (x, xs, xss) -> assert false
+  in tailed lst
+
+let ordered_cons lst =
+  assert false
 
 let delay_cons (f : int forklist) : int forklist =
-  let rec delay lst =
-    match lst with
-    | Nil -> Nil
-    | Cons (x, xs) -> funcons x (delay xs)
-    | Fork (x, lxs, rxs) -> funfork x (delay lxs) (delay rxs)
-  in delay f
+  let _ = ordered_cons (tailed_cons f);
 
-  let f = Cons (2, Fork(4, Cons(3, Nil), Cons (5, Nil)))
-  let g = Fork (4, Cons (2, Cons (3, Nil)), Cons(5, Nil))
-  let _ = assert (delay_cons f = g)
+let f = Cons (2, Fork(4, Cons(3, Nil), Cons (5, Nil))) in
+let g = Fork (4, Cons (2, Cons (3, Nil)), Cons(5, Nil)) in
+let _ = assert (delay_cons f = g)
