@@ -83,3 +83,9 @@ let eval (v : (string * bool) list) (e : bexp) : bool option =
       | _ -> None
     )
   in evaluate v e
+
+  let v = [("a", true); ("b", false); ("c", true)]
+  let e = And (Var "a", Or (Var "b", Var "c"))
+  let f = Not (Var "d")
+  let _ = assert (eval v e = Some true)
+  let _ = assert (eval v f = None)
