@@ -49,3 +49,7 @@ let delay_cons (f : int forklist) : int forklist =
     | Cons (x, xs) -> Cons(x, delay xs)
     | Fork (x, lxs, rxs) -> Fork(x, delay lxs, delay rxs)
   in delay f
+
+  let f = Cons (2, Fork(4, Cons(3, Nil), Cons (5, Nil)))
+  let g = Fork (4, Cons (2, Cons (3, Nil)), Cons(5, Nil))
+  let _ = assert (delay_cons f = g)
