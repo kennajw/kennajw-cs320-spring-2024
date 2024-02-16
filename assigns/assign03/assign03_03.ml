@@ -49,43 +49,53 @@ type bexp =
   | Or of bexp * bexp
 
 let extractval (v : (string * bool) list) (s : string) =
+(* extracts bools from (string * bool) list *)
   let rec extract (v : (string * bool) list) (s : string) : bool option =
     match v with
     | [] -> None
     | (a, b) :: c -> 
+(* checks if string matches, thus we obtain the corresponding bool *)
       if a = s
         then Some b
+(* call again if not *)
       else extract c s
   in extract v s
 
 let eval (v : (string * bool) list) (e : bexp) : bool option =
   let rec evaluate v e =
     match e with
+(* calls extractval to obtain bool value *)
     | Var str -> extractval v str
+(* recusively calls evaluate to obtain bool (whether the actual bool 
+or performs other expressions first ) then performs not operation *)
     | Not a -> (
+(* intializes recursive calls *)
       let nota = evaluate v a in
+(* pattern matches based on results of the recursive calls *)
       match nota with
-      | None -> None
-      | Some e1 -> Some (not e1) 
+      | Some e1 -> Some (not e1)
+      | _ -> None
       )
+(* recusively calls evaluate to obtain bool (whether the actual bool 
+or performs other expressions first ) then performs and operation *)
     | And (a, b) -> (
+(* intializes recursive calls *)
       let anda = evaluate v a in
       let andb = evaluate v b in
+(* pattern matches based on results of the recursive calls *)
       match anda, andb with
       | Some e1, Some e2 -> Some (e1 && e2)
       | _ -> None 
       )
+(* recusively calls evaluate to obtain bool (whether the actual bool 
+or performs other expressions first ) then performs or operation *)
     | Or (a, b) -> (
+(* intializes recursive calls *)
       let ora = evaluate v a in
       let orb = evaluate v b in
+(* pattern matches based on results of the recursive calls *)
       match ora, orb with
       | Some e1, Some e2 -> Some (e1 || e2)
       | _ -> None
     )
   in evaluate v e
-
-  let v = [("a", true); ("b", false); ("c", true)]
-  let e = And (Var "a", Or (Var "b", Var "c"))
-  let f = Not (Var "d")
-  let _ = assert (eval v e = Some true)
-  let _ = assert (eval v f = None)
