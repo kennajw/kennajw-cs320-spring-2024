@@ -55,7 +55,7 @@ let delay_cons (f : int forklist) : int forklist =
       )
       | Cons (s, ss) -> (
         if x > s
-          then Cons (s, Cons (x, ss))
+          then Cons (s, Cons (x, delay ss))
       else Cons (x, Cons (s, ss))
       )
       | Nil -> Cons (x, Nil)
