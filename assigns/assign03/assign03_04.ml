@@ -142,10 +142,33 @@ let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
       rows = rs ;
     }
   | [] -> Error ZeroRows
-  | [[]] -> Error ZeroCols
-
+  
 let transpose (m : 'a matrix) : 'a matrix =
-  assert false (* TODO *)
+  let rec buildx l c =
+    match l with
+    | (x :: xs) :: xss -> buildx xss (xs :: c)
+    | _ -> List.rev c
+  in
+
+  let rec buildxs l c =
+    match l with
+    | (x :: xs) :: xss -> buildxs xss (xs :: c)
+    | [] :: xs -> buildxs xs c
+    | _ -> List.rev c
+  in
+
+  let rec trans lst count =
+    match lst with
+    | _ ->
+      let x = buildx lst [] in
+      let xs = buildxs lst [] in
+      trans xs (x :: count)
+    | [] -> { 
+      num_rows = m.num_cols ; 
+      num_cols = m.num_rows ; 
+      rows = List.rev count ;
+    }
+    in trans m.rows [];
 
 let multiply (m : float matrix) (n : float matrix) : (float matrix, error) result =
-  assert false (* TODO *)
+  assert false (* TODO *) 
