@@ -129,12 +129,24 @@ let mk len lst =
   in check len lst
 
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
-(* checks and throws errors when applicable *)
+(* function that checks for unequal rows *)
+let rec check (le :int) (ls : 'a list list) =
+  match ls with
+  | x :: xs ->(
+    let lenx = List.length x in
+    if le != lenx
+      then false
+    else check le xs
+  )
+  | [] -> true
+in
+
+  (* checks and throws errors when applicable *)
   match rs with
   | x :: xs ->
     let lenx = List.length x in
     let lenrows = List.length rs in
-    if not (mk lenx xs)
+    if not (check lenx xs)
       then Error UnevenRows
     else if lenx = 0
       then Error ZeroCols
