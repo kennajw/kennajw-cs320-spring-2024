@@ -48,9 +48,17 @@ let delay_cons (f : int forklist) : int forklist =
     | Nil -> Nil
     | Cons (x, xs) -> (
       match xs with
-      | Fork (s, sl, sr) -> Fork(s, Cons(x, delay sl), delay sr)
-      | Cons (s, ss) -> Cons (s, delay ss)
-      | Nil -> Cons(x, Nil)
+      | Fork (s, sl, sr) -> (
+        if x > s
+          then Fork (s, delay sl, Cons (x, delay sr))
+        else Fork (s, Cons (x, delay sl), delay sr)
+      )
+      | Cons (s, ss) -> (
+        if x > s
+          then Cons (s, Cons (x, ss))
+      else Cons (x, Cons (s, ss))
+      )
+      | Nil -> Cons (x, Nil)
     )
     | Fork (x, xs, xss) -> Fork (x, delay xs, delay xss)
   in delay f

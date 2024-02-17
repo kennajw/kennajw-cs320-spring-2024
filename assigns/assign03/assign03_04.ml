@@ -126,7 +126,7 @@ let colcount lst =
 
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
   errorcheck rs;
-  let result = { 
+  let (result : 'a matrix errorcheck rs : error) = Ok { 
       num_rows = rowcount rs ;
       num_cols = colcount rs ;
       rows = rs ;
