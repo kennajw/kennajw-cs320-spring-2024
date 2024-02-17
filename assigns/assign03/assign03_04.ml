@@ -115,22 +115,34 @@ type 'a matrix = {
   rows : ('a list) list ;
 }
 
-let errorcheck lst =
-  assert false
-
-let rowcount lst =
-  assert false
-
-let colcount lst =
-  assert false
+let mk len lst =
+  let rec check le ls =
+    match lst with
+    | x :: xs ->(
+      let lenx = List.length x in
+      if le != lenx
+        then false
+      else check le xs
+    )
+    | [] -> true
+  in check len lst
 
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
-  errorcheck rs;
-  let (result : 'a matrix errorcheck rs : error) = Ok { 
-      num_rows = rowcount rs ;
-      num_cols = colcount rs ;
+  match rs with
+  | x :: xs ->
+    let lenx = List.length x in
+    let lenrows = List.length rs in
+    if mk lenx xs = false
+      then Error UnevenRows
+    else if lenx = 0
+      then Error ZeroCols
+    else Ok {
+      num_rows = lenrows ;
+      num_cols = lenx ;
       rows = rs ;
     }
+  | [] -> Error ZeroRows
+  | [[]] -> Error ZeroCols
 
 let transpose (m : 'a matrix) : 'a matrix =
   assert false (* TODO *)
