@@ -115,19 +115,6 @@ type 'a matrix = {
   rows : ('a list) list ;
 }
 
-let mk len lst =
-(* function that checks for unequal rows *)
-  let rec check le ls =
-    match lst with
-    | x :: xs ->(
-      let lenx = List.length x in
-      if le != lenx
-        then false
-      else check le xs
-    )
-    | [] -> true
-  in check len lst
-
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
 (* function that checks for unequal rows *)
 let rec check (le :int) (ls : 'a list list) =
