@@ -116,6 +116,7 @@ type 'a matrix = {
 }
 
 let mk len lst =
+(* function that checks for unequal rows *)
   let rec check le ls =
     match lst with
     | x :: xs ->(
@@ -128,47 +129,49 @@ let mk len lst =
   in check len lst
 
 let mkMatrix (rs : 'a list list) : ('a matrix, error) result =
+(* checks and throws errors when applicable *)
   match rs with
   | x :: xs ->
     let lenx = List.length x in
     let lenrows = List.length rs in
-    if mk lenx xs = false
+    if not (mk lenx xs)
       then Error UnevenRows
     else if lenx = 0
       then Error ZeroCols
+(* if the matrix passes without errors, then it is created *)
     else Ok {
       num_rows = lenrows ;
       num_cols = lenx ;
       rows = rs ;
     }
   | [] -> Error ZeroRows
-  
+  | [[]] -> Error ZeroCols
+
 let transpose (m : 'a matrix) : 'a matrix =
-  let rec buildx l c =
-    match l with
-    | (x :: xs) :: xss -> buildx xss (xs :: c)
-    | _ -> List.rev c
+(* creates the rows of the transpose *)
+  let rec transrow count row =
+    match row, count with
+    | [], [] -> []
+    | x :: xs, [] -> [x] :: transrow [] xs
+    | x :: xs, s :: ss -> (x :: s) :: transrow ss xs
+    | [], s :: ss -> [] :: transrow ss []
   in
 
-  let rec buildxs l c =
-    match l with
-    | (x :: xs) :: xss -> buildxs xss (xs :: c)
-    | [] :: xs -> buildxs xs c
-    | _ -> List.rev c
+  (* transposes to matrix while making calls to transrow *)
+  let rec trans rows count =
+    match rows with
+    | [] -> List.rev count
+    | [] :: _ -> trans (List.tl rows) count
+    | row :: rest -> trans rest (transrow count row)
   in
 
-  let rec trans lst count =
-    match lst with
-    | _ ->
-      let x = buildx lst [] in
-      let xs = buildxs lst [] in
-      trans xs (x :: count)
-    | [] -> { 
-      num_rows = m.num_cols ; 
-      num_cols = m.num_rows ; 
-      rows = List.rev count ;
-    }
-    in trans m.rows [];
+(* creates transpose *)
+  let trans = trans m.rows [] in 
+  { 
+    num_rows = m.num_cols ;
+    num_cols = m.num_rows ; 
+    rows = trans 
+  }
 
 let multiply (m : float matrix) (n : float matrix) : (float matrix, error) result =
-  assert false (* TODO *) 
+  assert false (* TODO *)
