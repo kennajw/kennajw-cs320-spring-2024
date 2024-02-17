@@ -42,28 +42,32 @@ type 'a forklist
   | Cons of 'a * 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
-let delay_cons (f : int forklist) : int forklist =
+let order_cons f num =
   let rec order lst i =
-      match lst with
-      | Fork (s, sl, sr) -> (
-        if i > s
-          then Fork (s, sl, order sr i)
-        else Fork (s, order sl i, sr)
-      )
-      | Cons (s, ss) -> (
-        if i > s
-          then Cons (s, order ss i)
-      else Cons (i, Cons (s, ss))
-      )
-      | Nil -> Cons (i, Nil)
-  in order f;
+    match lst with
+    | Fork (s, sl, sr) -> (
+      let order_right = order sr i in
+      let order_left = order sl i in
+      if i > s
+        then Fork (s, sl, order_right)
+      else Fork (s, order_left, sr)
+    )
+    | Cons (s, ss) -> (
+      let needs_order = order ss i in
+      if i > s
+        then Cons (s, needs_order)
+    else Cons (i, Cons (s, ss))
+    )
+    | Nil -> Cons (i, Nil)
+in order f num
 
+let delay_cons (f : int forklist) : int forklist =
   let rec delay lst =
     match lst with
     | Nil -> Nil
     | Cons (x, xs) -> (
       let delayed = delay xs in
-      order delayed x
+      order_cons delayed x
     )
     | Fork (x, xs, xss) -> Fork (x, delay xs, delay xss)
   in delay f
