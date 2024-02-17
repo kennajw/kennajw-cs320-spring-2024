@@ -42,32 +42,44 @@ type 'a forklist
   | Cons of 'a * 'a forklist
   | Fork of 'a * 'a forklist * 'a forklist
 
-let order_cons f num =
-  let rec order lst i =
-    match lst with
+let order_tail_cons (f : int forklist) (num : int) : int forklist =
+(* recursively makes it so the forklist is ordered and tailed*)
+  let rec order l i =
+    match l with
+(* fork is found in a cons, must tail it (must move cons (i) into the fork and move the fork outwards) *)
     | Fork (s, sl, sr) -> (
       let order_right = order sr i in
       let order_left = order sl i in
+(* check if i is greater than s *)
       if i > s
+(* if true, knows to add it to the right fork as it is always greater than s *)
         then Fork (s, sl, order_right)
+(* if false, knows to add it to the left fork as it is always less than s *)
       else Fork (s, order_left, sr)
     )
+(* must check if cons is ordered correctly *)
     | Cons (s, ss) -> (
       let needs_order = order ss i in
+(* checks if i is greater than s *)
       if i > s
+(* if true, then we can keep it the same and check the rest of the cons *)
         then Cons (s, needs_order)
+(* if false, need to switch i and s as the second entry in cons is always greater *)
     else Cons (i, Cons (s, ss))
     )
+(* we know Nil will always be in the end of cons so maintain that *)
     | Nil -> Cons (i, Nil)
 in order f num
 
 let delay_cons (f : int forklist) : int forklist =
-  let rec delay lst =
-    match lst with
+(* recursively matches forklist typing *)
+  let rec delay l =
+    match l with
     | Nil -> Nil
     | Cons (x, xs) -> (
+(* when a cons is found, must call order_tail_cons to check if its ordered and tailed *)
       let delayed = delay xs in
-      order_cons delayed x
+      order_tail_cons delayed x
     )
     | Fork (x, xs, xss) -> Fork (x, delay xs, delay xss)
   in delay f
