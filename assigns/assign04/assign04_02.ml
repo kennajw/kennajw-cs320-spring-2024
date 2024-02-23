@@ -63,8 +63,8 @@ let walks
 (* checks if the path created is actually valid *)
     let rec valid path =
       match path with
-      | [] -> true
-      | _ :: [] -> true
+      | [] -> len = 1
+      | _ :: [] -> len = 0
       |x :: (xs :: xss) -> g x xs && valid (xs :: xss)
     in
 
