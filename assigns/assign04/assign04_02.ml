@@ -64,7 +64,7 @@ let walks
     let rec valid path =
       match path with
       | [] -> true
-      | [_] -> true
+      | _ :: [] -> true
       |x :: (xs :: xss) -> g x xs && valid (xs :: xss)
     in
 
