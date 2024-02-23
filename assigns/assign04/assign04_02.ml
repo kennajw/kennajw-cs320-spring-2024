@@ -72,4 +72,5 @@ let walks
   paths_starts
     |> List.map (fun (p, st) -> create p st len)
     |> List.filter valid
+    |> List.rev
     |> List.map List.hd
