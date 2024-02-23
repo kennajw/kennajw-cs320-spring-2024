@@ -74,4 +74,4 @@ let walks
     let validlst = List.filter valid paths in
 
 (* collect all endpoints from the valid paths *)
-    List.map List.hd validlst
+    List.map List.hd (List.rev validlst)
