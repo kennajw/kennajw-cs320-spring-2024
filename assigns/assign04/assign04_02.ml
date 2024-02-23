@@ -33,12 +33,12 @@
    also be useful to try to use the pipelining operator `|>`.
 
    Examples:
-   let g1 (i : int) (j: int) = i < j && i <= 10 && j <= 10
-   let g2 (i : int) (j: int) = i <= 10 && j <= 10
+   let g1 (i : int) (j: int) = i < j && i <= 10 && j <= 10;;
+   let g2 (i : int) (j: int) = i <= 10 && j <= 10;;
 
-   let p1 i = i + 1
-   let p2 i = i - 1
-   let p3 i = i + 2
+   let p1 i = i + 1;;
+   let p2 i = i - 1;;
+   let p3 i = i + 2;;
 
    let _ = assert (walks g1 0 [(p1, 0); (p2, 0); (p3, 0)] = [0;0;0])
    let _ = assert (walks g1 1 [(p1, 0); (p2, 0); (p3, 0)] = [1;2])
@@ -49,10 +49,15 @@
    let _ = assert (walks g2 6 [(p1, 5); (p2, 11); (p3, -10)] = [2])
 *)
 
+let rec last = function
+  | [] -> assert false (* impossible *)
+  | [x] -> x
+  | _ :: xs -> last xs
+
 let walks
     (g : 'a -> 'a -> bool)
     (len : int)
-    (paths_starts : (('a -> 'a) * 'a) list) : 'a list list =
+    (paths_starts : (('a -> 'a) * 'a) list) : 'a list =
 (* function that creates the path and keep creating until len = 0 *)
     let rec create path st len =
       match len with
@@ -72,3 +77,4 @@ let walks
   paths_starts
     |> List.map (fun (p, st) -> create p st len)
     |> List.filter valid
+    |> List.map last
