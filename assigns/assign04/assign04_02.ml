@@ -63,15 +63,13 @@ let walks
 (* checks if the path created is actually valid *)
     let rec valid path =
       match path with
-      | [] -> len = 1
-      | _ :: [] -> len = 0
+      | [] -> true
+      | [_] -> true
       |x :: (xs :: xss) -> g x xs && valid (xs :: xss)
     in
 
 (* map create function to create all possible paths and then filter out only valid paths *)
-    let create_path (path, start) = create path start len in
-    let paths = List.map create_path paths_starts in
-    let validlst = List.filter valid paths in
-
-(* collect all endpoints from the valid paths *)
-    List.map List.hd (List.rev validlst)
+  paths_starts
+    |> List.map (fun (p, st) -> create p st len)
+    |> List.filter valid
+    |> List.map List.hd
