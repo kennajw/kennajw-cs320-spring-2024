@@ -29,7 +29,7 @@
 *)
 
 let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
-  let rec cycle (i : int) (acc : 'a ) : 'a =
+  let rec cycle (lst : ('a -> 'a) list) (i : int) (acc : 'a ) : 'a =
 (* match i to recurse through all functions *)
     match i with
 (* when i is 0, we know have we computed each function *)
@@ -37,5 +37,5 @@ let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
 (* if not, compute result of functions *)
     | _ -> 
 (* must use List.fold_left since it is tail-recursive (List.fold_right is not) *)
-      cycle (i - 1) (List.fold_left (fun result a -> a result) acc ( List.rev funcs))
-  in cycle (max n 0) x
+      cycle lst (i - 1) (List.fold_left (fun result a -> a result) acc lst)
+  in cycle (List.rev funcs) (max n 0) x
