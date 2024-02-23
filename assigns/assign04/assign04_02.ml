@@ -53,4 +53,25 @@ let walks
     (g : 'a -> 'a -> bool)
     (len : int)
     (paths_starts : (('a -> 'a) * 'a) list) : 'a list =
-  assert false (* TODO *)
+(* function that creates the path and keep creating until len = 0 *)
+    let rec create path st len =
+      match len with
+      | 0 -> [st]
+      | _ -> st :: create path (path st) (len - 1)
+    in
+
+(* checks if the path created is actually valid *)
+    let rec valid path =
+      match path with
+      | [] -> true
+      | [_] -> true
+      |x :: (xs :: xss) -> g x xs && valid (xs :: xss)
+    in
+
+(* map create function to create all possible paths and then filter out only valid paths *)
+    let create_path (path, start) = create path start len in
+    let paths = List.map create_path paths_starts in
+    let validlst = List.filter valid paths in
+
+(* collect all endpoints from the valid paths *)
+    List.map List.hd validlst
