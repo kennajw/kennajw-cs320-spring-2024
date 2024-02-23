@@ -52,7 +52,7 @@
 let walks
     (g : 'a -> 'a -> bool)
     (len : int)
-    (paths_starts : (('a -> 'a) * 'a) list) : 'a list =
+    (paths_starts : (('a -> 'a) * 'a) list) : 'a list list =
 (* function that creates the path and keep creating until len = 0 *)
     let rec create path st len =
       match len with
@@ -73,4 +73,3 @@ let walks
     |> List.map (fun (p, st) -> create p st len)
     |> List.filter valid
     |> List.rev
-    |> List.map List.hd
