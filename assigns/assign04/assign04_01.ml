@@ -37,5 +37,5 @@ let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
 (* if not, compute result of functions *)
     | _ -> 
 (* must use List.fold_left since it is tail-recursive (List.fold_right is not) *)
-      cycle (i - 1) (List.fold_left (fun result a -> a result) acc funcs)
+      cycle (i - 1) (List.fold_left (fun result a -> a result) acc ( List.rev funcs))
   in cycle (max n 0) x
