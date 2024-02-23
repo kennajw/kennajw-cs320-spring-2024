@@ -29,4 +29,8 @@
 *)
 
 let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
-  assert false (* TODO *)
+  let rec cycle (i : int) (acc : 'a ) : 'a =
+    match i with
+    | 0 -> acc
+    | _ -> assert false
+  in cycle (max n 0) x
