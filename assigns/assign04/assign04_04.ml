@@ -116,7 +116,11 @@ let list_conv
   List.map (f l) (consecutives (List.length l) r)
 
 let poly_mult_helper (u : int list) (v : int list) : int =
-  assert false (* TODO *)
+  let rec mult (lst1 : 'a list) (lst2 : int list) : int =
+    match lst1, lst2 with
+    | a :: b, c :: d -> (a * c) + mult b d
+    | _ -> 0
+  in mult u v
 
 let poly_mult (p : int list) (q : int list) : int list =
   let padding = List.init (List.length p - 1) (fun _ -> 0) in
