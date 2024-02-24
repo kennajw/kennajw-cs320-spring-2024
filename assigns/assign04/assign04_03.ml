@@ -90,10 +90,11 @@ let pythagorean_triples (n : int) : (int * int * int) list =
         for_loop (range (b + 1) n) (fun c ->
 (* bool whether its a pythagorean triple *)
           let pyth = a * a + b * b = c * c in
+          let triple = [(a, b, c)] in
 
 (* if true, then add to list; if false, return empty list *)
           if pyth
-            then [(a, b, c)]
+            then triple
           else [] 
   ))))
   in findall
