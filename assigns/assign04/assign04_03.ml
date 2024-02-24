@@ -81,4 +81,19 @@ let foo i j =
 (* let _ = assert (foo 1 10 = List.map (fun k -> k + k) (range 1 10)) *)
 
 let pythagorean_triples (n : int) : (int * int * int) list =
-  assert false (* TODO *)
+  let findall = (
+(* for loop for a *)
+    for_loop (range 1 n) (fun a -> 
+(* for loop for b *)
+      for_loop (range (a + 1) n) (fun b ->
+(* for loop for c *)
+        for_loop (range (b + 1) n) (fun c ->
+(* bool whether its a pythagorean triple *)
+          let pyth = a * a + b * b = c * c in
+
+(* if true, then add to list; if false, return empty list *)
+          if pyth
+            then [(a, b, c)]
+          else [] 
+  ))))
+  in findall
