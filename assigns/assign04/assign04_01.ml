@@ -32,20 +32,20 @@ let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
 (* initialize funcs list length to use later *)
   let funcs_len = List.length funcs in
 
-  let rec cycle (index : int) (acc : 'a ) (count : int) : 'a =
+  let rec cycle (num: int) x (index : int) : 'a =
 (* if there are still operations to compute, compute them and recursively call the next function *)
     if index > 0
       then
-        let func = List.nth funcs index in
         let i = (index + 1) mod funcs_len in
+        let func = List.nth funcs index in
 
-        cycle (index - 1) (func x) i
+        cycle (num - 1) (func x) i
 (* if not, just return x *)
     else x
   in 
 
 (* if list is not empty, perform recursive calls *)
-  if funcs <> []
-    then cycle n x 0
+  if funcs = []
+    then x
 (* return original x if no functions *)
-  else x
+  else cycle n x 0
