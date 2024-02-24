@@ -17,8 +17,8 @@
    Your implementation should be TAIL-RECURSIVE.
 
    Examples:
-   let f x = x + 1
-   let g x = x - 1
+   let f x = x + 1;;
+   let g x = x - 1;;
    let h x = x * x
    let k x = x / 2
    let _ = assert (apply_cycle [f;g;g] 8 0 = -2)
@@ -32,9 +32,9 @@ let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
 (* initialize funcs list length to use later *)
   let funcs_len = List.length funcs in
 
-  let rec cycle (num: int) x (index : int) : 'a =
+  let rec cycle (num: int) (x : 'a) (index : int) : 'a =
 (* if there are still operations to compute, compute them and recursively call the next function *)
-    if index > 0
+    if num > 0
       then
         let i = (index + 1) mod funcs_len in
         let func = List.nth funcs index in
@@ -45,7 +45,7 @@ let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
   in 
 
 (* if list is not empty, perform recursive calls *)
-  if funcs = []
-    then x
+  if funcs <> []
+    then cycle n x 0
 (* return original x if no functions *)
-  else cycle n x 0
+  else x
