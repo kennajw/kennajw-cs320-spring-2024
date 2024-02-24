@@ -29,14 +29,23 @@
 *)
 
 let apply_cycle (funcs : ('a -> 'a) list) (n : int) (x : 'a) : 'a =
-  let rec cycle (i : int) (acc : 'a ) : 'a =
-(* match i to recurse through all functions *)
-    match i with
-(* when i is 0, we know have we computed each function *)
-    | 0 -> acc
-(* if not, compute result of functions *)
-    | _ -> 
-(* must use List.fold_left since it is tail-recursive (List.fold_right is not) *)
-      let a = List.fold_left (fun acc' b -> b acc') acc funcs in
-      cycle (i - 1) a
-  in cycle (max n 0) x
+(* initialize funcs list length to use later *)
+  let funcs_len = List.length funcs in
+
+  let rec cycle (index : int) (acc : 'a ) (count : int) : 'a =
+(* if there are still operations to compute, compute them and recursively call the next function *)
+    if index > 0
+      then
+        let func = List.nth funcs index in
+        let i = (index + 1) mod funcs_len in
+
+        cycle (index - 1) (func x) i
+(* if not, just return x *)
+    else x
+  in 
+
+(* if list is not empty, perform recursive calls *)
+  if funcs <> []
+    then cycle n x 0
+(* return original x if no functions *)
+  else x
