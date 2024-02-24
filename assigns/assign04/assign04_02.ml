@@ -33,12 +33,12 @@
    also be useful to try to use the pipelining operator `|>`.
 
    Examples:
-   let g1 (i : int) (j: int) = i < j && i <= 10 && j <= 10;;
-   let g2 (i : int) (j: int) = i <= 10 && j <= 10;;
+   let g1 (i : int) (j: int) = i < j && i <= 10 && j <= 10
+   let g2 (i : int) (j: int) = i <= 10 && j <= 10
 
-   let p1 i = i + 1;;
-   let p2 i = i - 1;;
-   let p3 i = i + 2;;
+   let p1 i = i + 1
+   let p2 i = i - 1
+   let p3 i = i + 2
 
    let _ = assert (walks g1 0 [(p1, 0); (p2, 0); (p3, 0)] = [0;0;0])
    let _ = assert (walks g1 1 [(p1, 0); (p2, 0); (p3, 0)] = [1;2])
@@ -49,10 +49,12 @@
    let _ = assert (walks g2 6 [(p1, 5); (p2, 11); (p3, -10)] = [2])
 *)
 
-let rec last = function
-  | [] -> assert false (* impossible *)
+(* extracts the last element of a list *)
+let rec endpoint path =
+  match path with
+  | [] -> assert false (* impossible if calling on a valid path *)
   | [x] -> x
-  | _ :: xs -> last xs
+  | _ :: xs -> endpoint xs
 
 let walks
     (g : 'a -> 'a -> bool)
@@ -77,4 +79,6 @@ let walks
   paths_starts
     |> List.map (fun (p, st) -> create p st len)
     |> List.filter valid
-    |> List.map last
+(* created special endpoint function to extract last element of list (where the endpoint is) *)
+(* can't just do list.rev as the lists are in a list *)
+    |> List.map endpoint
