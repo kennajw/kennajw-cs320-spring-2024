@@ -79,10 +79,35 @@
 *)
 
 let rec map2 (f : 'a -> 'b -> 'c) (l : 'a list) (r : 'b list) : 'c list =
-  assert false (* TODO *)
+  match l, r with
+(* truncate if either list is empty -> so return empty list to signify end of recursion *)
+  | [], _ -> []
+  | _, [] -> []
+(* if neither is empty, perform function call on head of each list then recurse over the tails of each *)
+  | (a :: b), (c :: d) -> f a c :: map2 f b d
+
+let sublist l num =
+(* recursive function to create sublists *)
+  let rec sub lst n =
+    match lst with
+    | [] -> []
+    | x :: xs -> x :: sub xs (n - 1)
+  in sub l num
 
 let consecutives (len : int) (l : 'a list) : 'a list list =
-  assert false (* TODO *)
+(* checks if len is smaller than the actual length of the list *)
+  if len < List.length l
+    then
+  (* if so, create consecutive sublists based on the length of len *)
+(* creates initial sublists *)
+      let modified = List.tl l 
+        |> List.map (fun x -> [x]) in
+
+(* uses map2 to create lists of lists of consecutive elements *)
+      let consecslst = map2 (fun x y -> x :: y) l modified in
+      List.map (fun lst -> sublist lst len) consecslst
+(* if the length of l is greater, put l inside of a list *)
+  else [l]
 
 let list_conv
     (f : 'a list -> 'b list -> 'c)
