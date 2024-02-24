@@ -72,7 +72,7 @@ let walks
       match path with
       | [] -> true
       | [_] -> true
-      |x :: xs :: xss -> g x xs && valid (xs :: xss)
+      |x :: (xs :: xss) -> g x xs && valid (xs :: xss)
     in
 
 (* map create function to create all possible paths and then filter out only valid paths *)

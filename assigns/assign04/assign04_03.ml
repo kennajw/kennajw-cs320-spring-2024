@@ -59,7 +59,11 @@ let rec range i j =
     i :: range (i + 1) j
 
 let for_loop (l : 'a list) (f : 'a -> 'b list) : 'b list =
-  assert false (* TODO *)
+(* map the function to each element in the list *)
+  let result = List.map f l in
+(* flatten the list *)
+  List.concat result
+
 
 let foo i j =
   for_loop (range i j) (fun k ->
