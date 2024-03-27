@@ -106,7 +106,10 @@ type token
   | EOFT            (* end of file *)
 
 let next_token (cs : char list) : (token * char list) option =
-  assert false (* TODO *)
+  match cs with
+  | ':' :: ':' :: '=' :: xs -> Some (EqT, xs)
+  | '.' :: xs -> Some (PdT, xs)
+  | _ -> None
 
 let tokenize (s : string) : (token list) option =
   let rec go cs =
