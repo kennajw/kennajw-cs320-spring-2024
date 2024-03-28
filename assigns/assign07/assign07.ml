@@ -211,7 +211,7 @@ type grammar = rule list
 let expand_leftmost ((nt, sf) : rule) (s : sentform) : sentform =
   let rec expand (n, f) sent = 
     match sent with
-    | NT x :: xs -> assert false
+    | NT x :: xs -> T x :: NT x :: xs
     | T x :: xs -> expand (n, f) xs
     | _ -> assert false
   in expand (nt, sf) s
