@@ -209,9 +209,9 @@ type rule = string * sentform
 type grammar = rule list
 
 let expand_leftmost ((nt, sf) : rule) (s : sentform) : sentform =
-  let rec expand (n, f) sent = 
+  let rec expand (n, f) (sent : sentform) = 
     match sent with
-    | NT x :: xs -> T x :: NT x :: xs
+    | NT x :: xs when x = nt -> sf @ xs
     | T x :: xs -> expand (n, f) xs
     | _ -> assert false
   in expand (nt, sf) s
