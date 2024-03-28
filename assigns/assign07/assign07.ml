@@ -111,7 +111,7 @@ let next_token (cs : char list) : (token * char list) option =
   | '.' :: xs -> Some (PdT, xs)
   | '<' :: xs -> 
     let term, rest = span is_lower_case xs in
-    Some(NtmT (implode term), rest)
+    Some(NtmT (implode term), List.tl rest)
   | _ -> None
 
 let tokenize (s : string) : (token list) option =
