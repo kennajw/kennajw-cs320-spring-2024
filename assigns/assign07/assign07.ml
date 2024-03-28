@@ -268,7 +268,7 @@ let rec parse_sentform (ts : token list) : (sentform * token list) option =
   in parse ts [] 0
 
 let parse_rule (ts : token list) : (rule * token list) option =
-  assert false (* TODO *)
+  assert false
 
 let rec parse_grammar (ts : token list) : grammar * token list =
   assert false (* TODO *)
