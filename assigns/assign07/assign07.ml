@@ -254,7 +254,13 @@ let _ = assert (expand_leftmost r [NT "a"; T "b"; NT "a"] = [T "a"; NT "a"; T "b
 *)
 
 let rec parse_sentform (ts : token list) : (sentform * token list) option =
-  assert false (* TODO *)
+  let rec parse ls (acc : sentform) count =
+    match ls with
+    | PdT :: xs when count = 0 -> None
+    | EqT :: xs when count = 0 -> None
+    | EOFT :: xs when count = 0 -> None
+    | _ -> None
+  in parse ts [] 0
 
 let parse_rule (ts : token list) : (rule * token list) option =
   assert false (* TODO *)
