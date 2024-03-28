@@ -133,6 +133,7 @@ let next_token (cs : char list) : (token * char list) option =
           (let term, rest = span is_lower_case cs in
           Some (TmT (implode term), rest))
       else None
+    | [] -> Some(EOFT, [])
     | x :: xs when is_blank x -> next xs
     | _ -> None
   in next cs
