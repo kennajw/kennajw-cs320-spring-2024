@@ -282,7 +282,8 @@ let parse_rule (ts : token list) : (rule * token list) option =
 
 let rec parse_grammar (ts : token list) : grammar * token list =
   match parse_rule ts with
-  | Some (x, xs) -> parse_grammar xs
+  | Some ((x, xs), xss :: xsss) -> parse_grammar (xss :: xsss)
+  | Some ((x, xs), []) -> assert false
   | None -> ([], [])
 
 let parse_and_check (s : string) : grammar option =
