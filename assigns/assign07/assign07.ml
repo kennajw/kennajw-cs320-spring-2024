@@ -130,7 +130,7 @@ let next_token (cs : char list) : (token * char list) option =
     | x :: xs when is_lower_case x ->
       if check_list cs
         then 
-          (let term, rest = span is_lower_case xs in
+          (let term, rest = span is_lower_case cs in
           Some (TmT (implode term), rest))
       else None
     | x :: xs when is_blank x -> next xs
