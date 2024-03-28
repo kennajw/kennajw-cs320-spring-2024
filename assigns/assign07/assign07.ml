@@ -254,11 +254,16 @@ let _ = assert (expand_leftmost r [NT "a"; T "b"; NT "a"] = [T "a"; NT "a"; T "b
 *)
 
 let rec parse_sentform (ts : token list) : (sentform * token list) option =
-  let rec parse ls (acc : sentform) count =
+  let rec parse (ls : token list) (acc : sentform) (count : int) : (sentform * token list) option =
     match ls with
     | PdT :: xs when count = 0 -> None
     | EqT :: xs when count = 0 -> None
     | EOFT :: xs when count = 0 -> None
+    | NtmT x :: xs -> parse xs (acc @ [NT x]) (count + 1)
+    | TmT x :: xs -> parse xs (acc @ [T x]) (count + 1)
+    | PdT :: xs -> Some (acc, PdT :: xs)
+    | EqT :: xs -> Some (acc, EqT :: xs)
+    | EOFT :: xs -> Some (acc, EOFT :: xs)
     | _ -> None
   in parse ts [] 0
 
