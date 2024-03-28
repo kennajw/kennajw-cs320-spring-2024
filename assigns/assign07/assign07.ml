@@ -105,14 +105,35 @@ type token
   | PdT             (* . *)
   | EOFT            (* end of file *)
 
+let check_list (cs : char list) : bool =
+  let rec check ls =
+    match ls with 
+    | [] -> true
+    | x :: xs when is_lower_case x -> check xs
+    | x :: xs when is_lower_case x = false -> false
+    | _ -> false
+  in check cs
+
 let next_token (cs : char list) : (token * char list) option =
-  match cs with
-  | ':' :: ':' :: '=' :: xs -> Some (EqT, xs)
-  | '.' :: xs -> Some (PdT, xs)
-  | '<' :: xs -> 
-    let term, rest = span is_lower_case xs in
-    Some(NtmT (implode term), List.tl rest)
-  | _ -> None
+  let rec next cs =
+    match cs with
+    | ':' :: ':' :: '=' :: xs -> Some (EqT, xs)
+    | '.' :: xs -> Some (PdT, xs)
+    | '<' :: xs -> 
+      if check_list xs
+        then 
+          (let nonterm, rest = span is_lower_case xs in
+          Some (NtmT (implode nonterm), List.tl rest))
+      else None
+    | x :: xs when is_lower_case x ->
+      if check_list xs
+        then 
+          (let term, rest = span is_lower_case xs in
+          Some (TmT (implode term), rest))
+      else None
+    | x :: xs when is_blank x -> next xs
+    | _ -> None
+  in next cs
 
 let tokenize (s : string) : (token list) option =
   let rec go cs =
