@@ -109,6 +109,8 @@ let check_list (cs : char list) : bool =
   let rec check ls =
     match ls with 
     | [] -> true
+    | '>' :: xs -> true 
+    | ' ' :: xs -> true
     | x :: xs when is_lower_case x -> check xs
     | x :: xs when is_lower_case x = false -> false
     | _ -> false
