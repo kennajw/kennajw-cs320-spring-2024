@@ -209,7 +209,12 @@ type rule = string * sentform
 type grammar = rule list
 
 let expand_leftmost ((nt, sf) : rule) (s : sentform) : sentform =
-  assert false (* TODO *)
+  let rec expand (n, f) sent = 
+    match sent with
+    | NT x :: xs -> assert false
+    | T x :: xs -> expand (n, f) xs
+    | _ -> assert false
+  in expand (nt, sf) s
 
 (* <a> ::= a<a>. *)
 let r = "a", [T "a"; NT "a"]
