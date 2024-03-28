@@ -112,6 +112,7 @@ let check_list (cs : char list) : bool =
     | '<' :: xs -> true
     | '>' :: xs -> true 
     | ' ' :: xs -> true
+    | '.' :: xs -> true
     | x :: xs when is_lower_case x -> check xs
     | x :: xs when is_lower_case x = false -> false
     | _ -> false
