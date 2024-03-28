@@ -268,10 +268,20 @@ let rec parse_sentform (ts : token list) : (sentform * token list) option =
   in parse ts [] 0
 
 let parse_rule (ts : token list) : (rule * token list) option =
-  assert false
+  match ts with
+  | NtmT x :: EqT :: xs -> (
+    let sent = parse_sentform xs in
+    if sent = None
+      then None
+    else
+      match sent with
+      | Some (s, PdT :: ss) -> Some ((x, s), ss)
+      | _ -> None
+    )
+  | _ -> None
 
 let rec parse_grammar (ts : token list) : grammar * token list =
-  assert false (* TODO *)
+  assert false
 
 let parse_and_check (s : string) : grammar option =
   match tokenize s with
