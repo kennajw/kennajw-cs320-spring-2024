@@ -281,12 +281,13 @@ let parse_rule (ts : token list) : (rule * token list) option =
   | _ -> None
 
 let rec parse_grammar (ts : token list) : grammar * token list =
-  let rec parse ls count = 
+  let rec parse ls (acc : grammar) curr count = 
   match parse_rule ls with
-  | Some ((x, xs), xss :: xsss) -> parse (xss :: xsss) (count + 1)
-  | Some ((x, xs), []) -> assert false
   | None when count = 0 -> ([], [])
-  in parse ts 0
+  | None -> (acc, curr)
+  | Some ((x, xs), xss :: xsss) -> parse (xss :: xsss) (acc @ [x, xs]) (xss :: xsss) (count + 1)
+  | Some ((x, xs), []) -> (acc, [])
+  in parse ts [] [] 0
 
 let parse_and_check (s : string) : grammar option =
   match tokenize s with
