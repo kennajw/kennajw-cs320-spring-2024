@@ -286,7 +286,7 @@ let rec parse_grammar (ts : token list) : grammar * token list =
   | None when count = 0 -> ([], [])
   | None -> (acc, curr)
   | Some ((x, xs), xss :: xsss) -> parse (xss :: xsss) (acc @ [x, xs]) (xss :: xsss) (count + 1)
-  | Some ((x, xs), []) -> (acc, [])
+  | Some ((x, xs), []) -> (acc, curr)
   in parse ts [] [] 0
 
 let parse_and_check (s : string) : grammar option =
