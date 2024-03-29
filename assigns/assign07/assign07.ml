@@ -213,7 +213,7 @@ let expand_leftmost ((nt, sf) : rule) (s : sentform) : sentform =
     match sent with
     | NT x :: xs when x = nt -> acc @ sf @ xs
     | T x :: xs -> expand (n, f) xs ([T x] @ acc)
-    | _ -> assert false
+    | _ -> s
   in expand (nt, sf) s []
 
 (* <a> ::= a<a>. *)
