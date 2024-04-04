@@ -201,7 +201,9 @@ let parse_g_ident : string parser = (* TODO *)
 
 *)
 let parse_term : symbol parser = (* TODO *)
-  assert false
+  (char '\'') >>
+    (many (satisfy ((<>) '\'')) >|= implode) <<
+  (char '\'') >|= fun x -> T x
 
 (* A nonterminal symbols is given by the following grammar:
 
