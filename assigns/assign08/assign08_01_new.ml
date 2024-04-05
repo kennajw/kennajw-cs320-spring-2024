@@ -186,8 +186,8 @@ type grammars = grammar list
    after a grammar identifier.
 *)
 let parse_g_ident : string parser = (* TODO *)
-  assert false
-
+  many (satisfy is_upper_case) >|= implode
+ 
 (* A terminal symbol is ANY sequence of characters between two single
    quotes, e.g.,
 
@@ -225,7 +225,10 @@ let parse_term : symbol parser = (* TODO *)
 
 *)
 let parse_nonterm : symbol parser = (* TODO *)
-  assert false
+  let lower = many1 (satisfy is_lower_case) in
+  let rest = map2 (fun x xs -> x :: xs) (char '-') lower in
+  let ls = map2 (fun xs xss -> List.concat (xs :: xss)) lower (many rest) in
+  char '<' >> ls << char '>' >|= fun ls -> NT (implode ls)
 
 (* `parse_symbol` parses either a terminal, a nonterminal symbol or a
    nonterminal reference.
@@ -237,7 +240,9 @@ let parse_nonterm : symbol parser = (* TODO *)
 
 *)
 let parse_symbol : symbol parser = (* TODO *)
-  assert false
+  parse_term <|> parse_nonterm <|> (let dot = char '.' in
+                                    parse_g_ident >>= fun g_id ->
+                                    dot >> parse_nonterm >|= function NT nt_id -> NTRef (g_id, nt_id))
 
 (* A complex symbol is given by the following grammar:
 
@@ -255,7 +260,14 @@ let parse_symbol : symbol parser = (* TODO *)
 
 *)
 let parse_symbol_complex : symbol_complex parser =
-  assert false
+  let slst = parse_symbol >>= fun s -> many ((char ',') >> parse_symbol) >|= fun ss -> s :: ss in
+  let alst = slst >>= fun a -> many ((char '|') >> slst) >|= fun aa -> a :: aa in
+  let plst = alst <|> pure [] >|= function
+    | [] -> Opt []
+    | [[x]] -> Sym x
+    | alst -> Opt alst in
+  let p = (char '[' >> plst << char ']') <|> (char '{' >> plst << char '}') <|> plst in
+  p
 
 (* A sentential form is given by the following grammar:
 
