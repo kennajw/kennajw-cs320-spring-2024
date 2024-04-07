@@ -260,14 +260,11 @@ let parse_symbol : symbol parser = (* TODO *)
 
 *)
 let parse_symbol_complex : symbol_complex parser =
-  let slst = parse_symbol >>= fun s -> many ((char ',') >> parse_symbol) >|= fun ss -> s :: ss in
-  let alst = slst >>= fun a -> many ((char '|') >> slst) >|= fun aa -> a :: aa in
-  let plst = alst <|> pure [] >|= function
-    | [] -> Opt []
-    | [[x]] -> Sym x
-    | alst -> Opt alst in
-  let p = (char '[' >> plst << char ']') <|> (char '{' >> plst << char '}') <|> plst in
-  p
+  let parse_symbol_list = parse_symbol >>= fun sym -> many (parse_symbol) >|= fun syms -> sym :: syms in
+  let parse_repetition = (char '{') >> parse_symbol_list << (char '|') >> parse_symbol_list << (char '}') >|= fun syms -> Rep [syms] in
+  let parse_optional = (char '[') >> parse_symbol_list << (char '|') >> parse_symbol_list << (char ']') >|= fun syms -> Opt [syms] in
+  parse_repetition <|> parse_optional <|> (parse_symbol >|= fun sym -> Sym sym)
+
 
 (* A sentential form is given by the following grammar:
 
@@ -282,7 +279,8 @@ let parse_symbol_complex : symbol_complex parser =
 
 *)
 let parse_sentform : sentform parser = (* TODO *)
-  assert false
+  (many1 (parse_symbol_complex << ws)) <|>
+  (keyword "EMPTY" >| [])
 
 (* A rule is given by the following grammar:
 

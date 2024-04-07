@@ -235,6 +235,8 @@ type command
   | Sub
   | Mul
   | Div
+  | Recall
+  | Store
 
 (* Parsing floats
 
