@@ -260,10 +260,11 @@ let parse_symbol : symbol parser = (* TODO *)
 
 *)
 let parse_symbol_complex : symbol_complex parser =
-  let parse_symbol_list = parse_symbol >>= fun sym -> many (parse_symbol) >|= fun syms -> sym :: syms in
-  let parse_repetition = (char '{') >> parse_symbol_list << (char '|') >> parse_symbol_list << (char '}') >|= fun syms -> Rep [syms] in
-  let parse_optional = (char '[') >> parse_symbol_list << (char '|') >> parse_symbol_list << (char ']') >|= fun syms -> Opt [syms] in
-  parse_repetition <|> parse_optional <|> (parse_symbol >|= fun sym -> Sym sym)
+  let parse_alt = ws >> many1(optional (char '|') >> ((many1(ws >> parse_symbol << ws)) <|> ((ws >> str "EMPTY" << ws) >| []))) in
+  let parse_rep = ((char '{') >> parse_alt << (char '}') << ws >|= fun sym -> Rep sym) in
+  let parse_opt = ((char '[') >> parse_alt << (char ']') << ws >|= fun sym -> Opt Sym) in
+  let parse_sym  = (parse_symbol >|= fun sym -> Sym sym) in
+  parse_rep <|> parse_opt <|> parse_sym
 
 
 (* A sentential form is given by the following grammar:
@@ -295,7 +296,10 @@ let parse_sentform : sentform parser = (* TODO *)
 
 *)
 let parse_rule : rule list parser = (* TODO *)
-  assert false
+map2
+  (fun nt sfs -> List.map (fun sf -> nt, sf) sfs)
+  ((keyword "RULE") >> parse_nonterm << ws << keyword "::=" >|= parse_symbol_complex)
+  (parse_sentform << keyword ".")
 
 (* A grammar is given by the following grammar:
 
