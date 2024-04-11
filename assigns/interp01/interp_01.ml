@@ -120,7 +120,44 @@ type command
   | Num of int             (* num *)
 and program = command list
 
-let parse_ident = fail (* TODO *)
+let parse_ident  = 
+  many (satisfy is_upper_case) >|= fun x -> (implode x)
+
+let parse_drop : program parser =
+  char 'd' >> char 'r' >> char 'o' >> char 'p' >| [Drop]
+
+let parse_swap : program parser =
+  char 's' >> char 'w' >> char 'a' >> char 'p' >| [Swap]
+
+let parse_dup : program parser =
+  char 'd' >> char 'u' >> char 'p' >| [Dup]
+
+let parse_trace : program parser =
+  char '.' >| [Trace]
+
+let parse_add : program parser =
+  char '+' >| [Add]
+
+let parse_sub : program parser =
+  char '-' >| [Sub]
+
+let parse_mul : program parser =
+  char '*' >| [Mul]
+
+let parse_div : program parser =
+  char '/' >| [Div]
+
+let parse_lt : program parser =
+  char '<' >| [Lt]
+
+let parse_eq : program parser =
+  char '=' >| [Eq]
+
+let parse_keyword : program parser =
+  parse_drop <|> parse_swap <|> parse_dup
+
+let parse_symbol : program parser =
+  parse_trace <|> parse_add <|> parse_sub <|> parse_mul <|> parse_div <|> parse_lt <|> parse_eq
 
 (* You are not required to used this but it may be useful in
    understanding how to use `rec_parser` *)
@@ -134,7 +171,7 @@ let rec parse_com () =
 and parse_prog_rec () =
   many ((rec_parser parse_com) << ws)
 
-let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
+(*let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
   let rec go acc r =
     match r with
     | [] -> l, []
@@ -217,10 +254,10 @@ let next_token (ls : char list) : (command * char list) option =
       | _ -> None)
     | x :: xs when is_blank x -> next xs []
     | _ -> None
-  in next ls []
+  in next ls []*)
  
-let parse_prog (s : string) : program option = 
-  let rec p cs =
+let parse_prog (s : string) : program option = assert false
+  (*let rec p cs =
     match next_token cs with
     | None -> None
     | Some (t, []) -> Some [t]
@@ -228,7 +265,7 @@ let parse_prog (s : string) : program option =
       match p rest with
       | None -> Some [t]
       | Some ts -> Some (t :: ts)
-  in p (explode s)
+  in p (explode s)*)
 
 (* A VERY SMALL TEST SET *)
 (*
