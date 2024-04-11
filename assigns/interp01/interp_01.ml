@@ -134,7 +134,68 @@ let rec parse_com () =
 and parse_prog_rec () =
   many ((rec_parser parse_com) << ws)
 
-let parse_prog = assert false (* TODO *)
+let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
+  let rec go acc r =
+    match r with
+    | [] -> l, []
+    | x :: xs ->
+      if p x
+      then go (x :: acc) xs
+      else List.rev acc, r
+  in go [] l
+
+let next_token (ls : char list) : (command * char list) option =
+  let rec next cs = 
+    match cs with 
+    | 'd' :: 'r' :: 'o' :: 'p' :: xs -> Some (Drop, xs)
+    | 's' :: 'w' :: 'a' :: 'p' :: xs -> Some (Swap, xs)
+    | 'd' :: 'u' :: 'p' :: xs -> Some (Dup, xs)
+    | '.' :: xs -> Some (Trace, xs)
+    | '+' :: xs -> Some (Add, xs)
+    | '-' :: xs -> Some (Sub, xs)
+    | '*' :: xs -> Some (Mul, xs)
+    | '/' :: xs -> Some (Div, xs)
+    | '=' :: xs -> Some (Eq, xs)
+    | '|' :: '>' :: xs -> 
+      (match xs with
+      | xs :: xss when is_upper_case xs -> 
+        (let term, rest = span is_upper_case (xs :: xss) in
+        Some (Bind (implode term), rest))
+      | xs :: xss when is_blank xs ->
+        (let wterm, wrest = span is_blank (xs :: xss) in
+        match wrest with
+        | s :: ss when is_upper_case s ->
+          (let term, rest = span is_upper_case (s :: ss) in
+          Some (Bind (implode term), rest))
+        | _ -> None)
+      | _ -> None)
+    | '#' :: xs ->
+      (match xs with
+      | xs :: xss when is_upper_case xs -> 
+        (let term, rest = span is_upper_case (xs :: xss) in
+        Some (Call (implode term), rest))
+      | xs :: xss when is_blank xs ->
+        (let wterm, wrest = span is_blank (xs :: xss) in
+        match wrest with
+        | s :: ss when is_upper_case s ->
+          (let term, rest = span is_upper_case (s :: ss) in
+          Some (Call (implode term), rest))
+        | _ -> None)
+      | _ -> None)
+    | x :: xs when is_blank x -> next xs
+    | _ -> None
+  in next ls
+
+let parse_prog (s : string) : program option = 
+  let rec p cs =
+    match next_token cs with
+    | None -> None
+    | Some (t, []) -> Some [t]
+    | Some (t, rest) ->
+      match p rest with
+      | None -> None
+      | Some ts -> Some (t :: ts)
+  in p (explode s)
 
 (* A VERY SMALL TEST SET *)
 (*
