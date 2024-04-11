@@ -144,8 +144,19 @@ let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
       else List.rev acc, r
   in go [] l
 
+let check_semi (ls : char list) : bool =
+  let rec check cs =
+    match cs with 
+    | ';' :: xs -> true
+    | x :: xs -> check xs
+    | [] -> false
+  in check ls
+
+let is_not_semi c =
+  c <> ';'
+
 let next_token (ls : char list) : (command * char list) option =
-  let rec next cs = 
+  let rec next cs acc = 
     match cs with 
     | 'd' :: 'r' :: 'o' :: 'p' :: xs -> Some (Drop, xs)
     | 's' :: 'w' :: 'a' :: 'p' :: xs -> Some (Swap, xs)
@@ -182,10 +193,32 @@ let next_token (ls : char list) : (command * char list) option =
           Some (Call (implode term), rest))
         | _ -> None)
       | _ -> None)
-    | x :: xs when is_blank x -> next xs
+    | 'd' :: 'e' :: 'f' :: xs when check_semi xs -> 
+      (let term, rest = span is_not_semi xs in
+      match term with
+      | s :: ss when is_upper_case s -> 
+        (let t, r = span is_upper_case (s :: ss) in
+        (*Some (Def ((implode t), r), List.tl rest)*)
+        match next r acc with
+        | Some (a, b) -> next b (a :: acc)
+        | None when acc <> [] -> Some (Def ((implode t), acc), List.tl rest)
+        | None -> None)
+      | s :: ss when is_blank s -> 
+        (let wterm, wrest = span is_blank (s :: ss) in
+        match wrest with
+        | s :: ss when is_upper_case s ->
+          (let t, r = span is_upper_case (s :: ss) in
+          (*Some (Def ((implode t), r), List.tl rest)*)
+          match next r acc with
+          | Some (a, b) -> next b (a :: acc)
+          | None when acc <> [] -> Some (Def ((implode t), acc), rest)
+          | None -> None)
+        | _ -> None)
+      | _ -> None)
+    | x :: xs when is_blank x -> next xs []
     | _ -> None
-  in next ls
-
+  in next ls []
+ 
 let parse_prog (s : string) : program option = 
   let rec p cs =
     match next_token cs with
@@ -193,7 +226,7 @@ let parse_prog (s : string) : program option =
     | Some (t, []) -> Some [t]
     | Some (t, rest) ->
       match p rest with
-      | None -> None
+      | None -> Some [t]
       | Some ts -> Some (t :: ts)
   in p (explode s)
 
