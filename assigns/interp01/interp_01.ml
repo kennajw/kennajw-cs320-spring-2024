@@ -171,8 +171,8 @@ let parse_symbol : command parser =
 let parse_compound : command parser =
   parse_bind <|> parse_call
 
-let parse_simple : command parser = 
-  parse_keyword <|> parse_symbol <|> parse_compound
+let parse_simple : command parser =
+  parse_symbol <|> parse_compound <|> parse_keyword
 
 (* You are not required to used this but it may be useful in
    understanding how to use `rec_parser` *)
@@ -190,8 +190,8 @@ let rec parse_com () =
 and parse_prog_rec () =
   many ((rec_parser parse_com) << ws)
 
-let parse_com : command parser =
-  (parse_com ()) <|> parse_simple
+(*let parse_com : command parser =
+  (parse_com ()) <|> parse_simple*)
 
 (*let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
   let rec go acc r =
