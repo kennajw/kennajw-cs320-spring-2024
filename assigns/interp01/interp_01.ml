@@ -123,41 +123,56 @@ and program = command list
 let parse_ident  = 
   many (satisfy is_upper_case) >|= fun x -> (implode x)
 
-let parse_drop : program parser =
-  char 'd' >> char 'r' >> char 'o' >> char 'p' >| [Drop]
+let parse_id : command parser =
+  parse_ident << ws >|= fun x -> Ident x
 
-let parse_swap : program parser =
-  char 's' >> char 'w' >> char 'a' >> char 'p' >| [Swap]
+let parse_drop : command parser =
+  keyword "drop" << ws >| Drop
 
-let parse_dup : program parser =
-  char 'd' >> char 'u' >> char 'p' >| [Dup]
+let parse_swap : command parser =
+  keyword "swap" << ws >| Swap
 
-let parse_trace : program parser =
-  char '.' >| [Trace]
+let parse_dup : command parser =
+  keyword "dup" << ws >| Dup
 
-let parse_add : program parser =
-  char '+' >| [Add]
+let parse_trace : command parser =
+  char '.' << ws >| Trace
 
-let parse_sub : program parser =
-  char '-' >| [Sub]
+let parse_add : command parser =
+  char '+' << ws >| Add
 
-let parse_mul : program parser =
-  char '*' >| [Mul]
+let parse_sub : command parser =
+  char '-' << ws >| Sub
 
-let parse_div : program parser =
-  char '/' >| [Div]
+let parse_mul : command parser =
+  char '*' << ws >| Mul
 
-let parse_lt : program parser =
-  char '<' >| [Lt]
+let parse_div : command parser =
+  char '/' << ws >| Div
 
-let parse_eq : program parser =
-  char '=' >| [Eq]
+let parse_lt : command parser =
+  char '<' << ws >| Lt
 
-let parse_keyword : program parser =
-  parse_drop <|> parse_swap <|> parse_dup
+let parse_eq : command parser =
+  char '=' << ws >| Eq
 
-let parse_symbol : program parser =
+let parse_bind : command parser =
+  keyword "|>" << ws >> parse_ident >|= fun x -> Bind x
+
+let parse_call : command parser =
+  char '#' << ws >> parse_ident >|= fun x -> Call x
+
+let parse_keyword : command parser =
+  parse_drop <|> parse_swap <|> parse_dup <|> parse_id
+
+let parse_symbol : command parser =
   parse_trace <|> parse_add <|> parse_sub <|> parse_mul <|> parse_div <|> parse_lt <|> parse_eq
+
+let parse_compound : command parser =
+  parse_bind <|> parse_call
+
+let parse_simple : command parser = 
+  parse_keyword <|> parse_symbol <|> parse_compound
 
 (* You are not required to used this but it may be useful in
    understanding how to use `rec_parser` *)
@@ -167,9 +182,16 @@ let rec parse_com () =
       (fun id p -> Def (id, p))
       (keyword "def" >> parse_ident << ws)
       (parse_prog_rec () << char ';')
-  in parse_def <|> fail (* TODO *)
+  in let parse_if = 
+    map
+      (fun p -> If p)
+      (char '?' >> parse_prog_rec () << char ';')
+  in parse_def <|> parse_if <|> parse_simple
 and parse_prog_rec () =
   many ((rec_parser parse_com) << ws)
+
+let parse_com : command parser =
+  (parse_com ()) <|> parse_simple
 
 (*let span (p : 'a -> bool) (l : 'a list) : 'a list * 'a list =
   let rec go acc r =
@@ -256,7 +278,9 @@ let next_token (ls : char list) : (command * char list) option =
     | _ -> None
   in next ls []*)
  
-let parse_prog (s : string) : program option = assert false
+let parse_prog (s : string) : program option = 
+  assert false
+  
   (*let rec p cs =
     match next_token cs with
     | None -> None
