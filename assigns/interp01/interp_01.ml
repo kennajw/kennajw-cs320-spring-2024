@@ -121,10 +121,19 @@ type command
 and program = command list
 
 let parse_ident  = 
-  many (satisfy is_upper_case) >|= fun x -> (implode x)
+  many1 (satisfy is_upper_case) >|= fun x -> (implode x)
+
+let is_non_zero c =
+  '1' <= c && c <= '9'
+
+let is_zero c =
+  '0' = c
 
 let parse_id : command parser =
   parse_ident << ws >|= fun x -> Ident x
+
+let parse_num : command parser =
+  (many1 (satisfy is_zero) >> many1 (satisfy is_non_zero) >|= fun x -> Num (int_of_string (implode x))) <|> (many1 (satisfy is_digit) >|= fun x -> Num (int_of_string (implode x)))
 
 let parse_drop : command parser =
   keyword "drop" << ws >| Drop
@@ -163,10 +172,10 @@ let parse_call : command parser =
   char '#' << ws >> parse_ident >|= fun x -> Call x
 
 let parse_keyword : command parser =
-  parse_drop <|> parse_swap <|> parse_dup <|> parse_id
+  parse_drop <|> parse_swap <|> parse_dup (*<|> parse_id*)
 
 let parse_symbol : command parser =
-  parse_trace <|> parse_add <|> parse_sub <|> parse_mul <|> parse_div <|> parse_lt <|> parse_eq
+  parse_trace <|> parse_add <|> parse_sub <|> parse_mul <|> parse_div <|> parse_lt <|> parse_eq <|> parse_num <|> parse_id
 
 let parse_compound : command parser =
   parse_bind <|> parse_call
@@ -184,11 +193,11 @@ let rec parse_com () =
       (parse_prog_rec () << char ';')
   in let parse_if = 
     map
-      (fun p -> If p)
-      (char '?' >> parse_prog_rec () << char ';')
-  in parse_def <|> parse_if <|> parse_simple
+      (fun p -> If (p))
+      (char '?' >> ws >> parse_prog_rec () << char ';' << ws)
+  in parse_def <|> parse_if <|> parse_simple 
 and parse_prog_rec () =
-  many ((rec_parser parse_com) << ws)
+  ws >> many ((rec_parser parse_com) << ws)
 
 (*let parse_com : command parser =
   (parse_com ()) <|> parse_simple*)
@@ -278,8 +287,8 @@ let next_token (ls : char list) : (command * char list) option =
     | _ -> None
   in next ls []*)
  
-let parse_prog (s : string) : program option = 
-  assert false
+let parse_prog (s : string): program option = 
+  parse (parse_prog_rec ()) s
   
   (*let rec p cs =
     match next_token cs with
