@@ -351,10 +351,64 @@ type value
 type env = (ident * value) list
 type trace = string list
 
-let update_env = assert false (* TODO *)
-let fetch_env = assert false (* TODO *)
-let eval_prog = assert false (* TODO *)
-let interp = assert false (* TODO *)
+let update_env (e : env) (i : ident) (v : value) : env = assert false (* TODO *)
+let fetch_env (e : env) (i : ident) : value option = assert false (* TODO *)
+let evaluate (s : stack) (e : env) (t : trace) (p : program) =
+  let rec eval stk en tr pr =
+    match pr, stk, en, tr with
+    (* DROP *)
+    | Drop :: rest, n :: s, e, t -> eval s e t rest
+    | Drop :: rest, [], e, t -> eval [] e ("panic: stack empty" :: t) []
+    (* SWAP *)
+    | Swap :: rest, x :: y :: s, e, t -> eval (y :: x :: s) e t rest
+    | Swap :: rest, x :: [], e, t -> eval (x :: []) e ("panic: fewer than 2 elements on the stack" :: t) []
+    | Swap :: rest, [], e, t -> eval [] e ("panic: less than 2 elements on the stack" :: t) []
+    (* DUP *)
+    | Dup :: rest, n :: s, e, t-> eval (n :: n :: s) e t rest
+    | Dup :: rest, [], e, t -> eval [] e ("panic: stack empty" :: t) []
+    (* TRACE *)
+    | Trace :: rest, n :: s, e, t -> eval s e ((string_of_int n) :: t) rest
+    | Trace :: rest, [], e, t -> eval [] e ("panic: stack empty" :: t) []
+    (* PUSH *)
+    | Num n :: rest, s, e, t -> eval (n :: s) e t rest
+    (* ADD *)
+    | Add :: rest, x :: y :: s, e, t -> eval ((x + y) :: s) e t rest
+    | Add :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
+    | Add :: rest, [], e, t -> eval ([]) e ("panic: less than 2 elements on the stack" :: t) []
+    (* SUB *)
+    | Sub :: rest, x :: y :: s, e, t -> eval ((x - y) :: s) e t rest
+    | Sub :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
+    | Sub :: rest, [], e, t -> eval ([]) e ("panic: less than 2 elements on the stack" :: t) []
+    (* MUL *)
+    | Mul :: rest, x :: y :: s, e, t -> eval ((x * y) :: s) e t rest
+    | Mul :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
+    | Mul :: rest, [], e, t -> eval ([]) e ("panic: less than 2 elements on the stack" :: t) []
+    (* DIV *)
+    | Div :: rest, x :: 0 :: s, e, t -> eval (x :: 0 :: s) e ("panic: second argument is 0" :: t) []
+    | Div :: rest, x :: y :: s, e, t -> eval ((x / y) :: s) e t rest 
+    | Div :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
+    | Div :: rest, [], e, t -> eval ([]) e ("panic: less than 2 elements on the stack" :: t) []
+    (* LT *)
+    | Lt :: rest, x :: y :: s, e, t when x < y -> eval (1 :: s) e t rest
+    | Lt :: rest, x :: y :: s, e, t when x >= y -> eval (0 :: s) e t rest
+    | Lt :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: []) []
+    | Lt :: rest, [], e, t -> eval ([]) e ("panic: less than 2 elements on the stack" :: []) []
+    (* EQ *)
+    | Eq :: rest, x :: y :: s, e, t when x = y -> eval (1 :: s) e t rest
+    | Eq :: rest, x :: y :: s, e, t when x <> y -> eval (0 :: s) e t rest
+    | Eq :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
+    | Eq :: rest, [], e, t -> eval [] e ("panic: less than 2 elements on the stack" :: t) []
+    (* BIND *)
+    (* IDENT *)
+    (* DEF *)
+    (* CALL *)
+    (* IF *)
+
+  in eval s e t p
+let eval_prog (s : stack) (e : env) (p : program) : trace = 
+  let stk, en, tr, pr = evaluate s e [] p in
+  tr
+let interp (t : trace) : trace option = assert false (* TODO *)
 
 (* END OF PROJECT CODE *)
 
