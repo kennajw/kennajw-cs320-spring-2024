@@ -360,8 +360,8 @@ let fetch_env (e : env) (i : ident) : value option =
     | (a, v) :: rest -> fetch rest id
     | [] -> None
   in fetch e i
-let evaluate (s : stack) (e : env) (t : trace) (p : program) =
-  let rec eval stk en tr pr =
+let evaluate (s : stack) (e : env) (t : trace) (p : program) : trace =
+  let rec eval (stk : stack) (en : env) (tr : trace) (pr : program) =
     match pr, stk, en, tr with
     (* DROP *)
     | Drop :: rest, n :: s, e, t -> eval s e t rest
@@ -427,7 +427,7 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) =
     | If x :: rest, [], e, t -> eval [] e ("panic: stack is empty" :: t) []
     | If x :: rest, s, e, t -> eval s e t (x @ rest)
     (* CATCH *)
-    | _ -> t
+    | _ -> tr
   in eval s e t p
 let eval_prog (s : stack) (e : env) (p : program) : trace = 
   evaluate s e [] p
@@ -442,7 +442,7 @@ let interp (s : string) : trace option =
 
 (* UNCOMMENT TO RUN INTERPRETER *)
 
-let print_trace t =
+(*let print_trace t =
   let rec go t =
     match t with
     | [] -> ()
@@ -465,5 +465,5 @@ let main () =
   | None -> print_endline "Parse Error"
   | Some t -> print_trace t
 
-let _ = main ()
+let _ = main ()*)
 
