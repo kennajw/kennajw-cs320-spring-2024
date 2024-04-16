@@ -352,7 +352,13 @@ type env = (ident * value) list
 type trace = string list
 
 let update_env (e : env) (i : ident) (v : value) : env = assert false (* TODO *)
-let fetch_env (e : env) (i : ident) : value option = assert false (* TODO *)
+let fetch_env (e : env) (i : ident) : value option = 
+  let rec fetch (en : env) (id : ident) : value option =
+    match en with
+    | (a, v) :: rest when a = id -> Some (v)
+    | (a, v) :: rest -> fetch rest id
+    | [] -> None
+  in fetch e i
 let evaluate (s : stack) (e : env) (t : trace) (p : program) =
   let rec eval stk en tr pr =
     match pr, stk, en, tr with
@@ -400,9 +406,22 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) =
     | Eq :: rest, [], e, t -> eval [] e ("panic: less than 2 elements on the stack" :: t) []
     (* BIND *)
     (* IDENT *)
+    | Ident x :: rest, s, e, t ->
+      (match fetch_env e x with
+      | Some (Num a) -> eval (a :: s) e t rest
+      | Some (Prog b) -> eval s e ("panic: identifier is bound to a program" :: t) []
+      | None -> eval s e ("panic: identifier is bound to nothing" :: t) [])
     (* DEF *)
     (* CALL *)
+    | Call x :: rest, s, e, t ->
+      (match fetch_env e x with
+      | Some (Prog a) -> eval s e t (a @ rest)
+      | Some (Num b) -> eval s e ("panic: identifier is bound to a number" :: t) []
+      | None -> eval s e ("panic: identifier is bound to nothing" :: t) [])
     (* IF *)
+    | If x :: rest, 0 :: s, e, t -> eval s e t rest
+    | If x :: rest, [], e, t -> eval [] e ("panic: stack is empty" :: t) []
+    | If x :: rest, s, e, t -> eval s e t (x @ rest)
 
   in eval s e t p
 let eval_prog (s : stack) (e : env) (p : program) : trace = 
