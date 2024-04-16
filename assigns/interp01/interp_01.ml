@@ -351,7 +351,8 @@ type value
 type env = (ident * value) list
 type trace = string list
 
-let update_env (e : env) (i : ident) (v : value) : env = assert false (* TODO *)
+let update_env (e : env) (i : ident) (v : value) : env =
+  [i, v] @ e
 let fetch_env (e : env) (i : ident) : value option = 
   let rec fetch (en : env) (id : ident) : value option =
     match en with
@@ -405,6 +406,8 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) =
     | Eq :: rest, x :: [], e, t -> eval (x :: []) e ("panic: less than 2 elements on the stack" :: t) []
     | Eq :: rest, [], e, t -> eval [] e ("panic: less than 2 elements on the stack" :: t) []
     (* BIND *)
+    | Bind x :: rest, [], e, t -> eval [] e ("panic: stack is empty" :: t) []
+    | Bind x :: rest, n :: s, e, t -> eval s (update_env e x (Num n)) t rest
     (* IDENT *)
     | Ident x :: rest, s, e, t ->
       (match fetch_env e x with
@@ -412,6 +415,7 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) =
       | Some (Prog b) -> eval s e ("panic: identifier is bound to a program" :: t) []
       | None -> eval s e ("panic: identifier is bound to nothing" :: t) [])
     (* DEF *)
+    | Def (x, q) :: rest, s, e, t -> eval s (update_env e x (Prog q)) t rest
     (* CALL *)
     | Call x :: rest, s, e, t ->
       (match fetch_env e x with
@@ -422,12 +426,15 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) =
     | If x :: rest, 0 :: s, e, t -> eval s e t rest
     | If x :: rest, [], e, t -> eval [] e ("panic: stack is empty" :: t) []
     | If x :: rest, s, e, t -> eval s e t (x @ rest)
-
+    (* CATCH *)
+    | _ -> t
   in eval s e t p
 let eval_prog (s : stack) (e : env) (p : program) : trace = 
-  let stk, en, tr, pr = evaluate s e [] p in
-  tr
-let interp (t : trace) : trace option = assert false (* TODO *)
+  evaluate s e [] p
+let interp (s : string) : trace option = 
+  match parse_prog s with
+  | None -> None
+  | Some x -> Some (eval_prog [] [] x)
 
 (* END OF PROJECT CODE *)
 
@@ -444,7 +451,7 @@ let print_trace t =
       go t
   in go (List.rev t)
 
-(*
+
 let main () =
   let input =
     let rec get_input s =
@@ -459,4 +466,4 @@ let main () =
   | Some t -> print_trace t
 
 let _ = main ()
-*)
+
