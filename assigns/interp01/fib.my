@@ -1,1 +1,18 @@
-def FIB ;
+def ISNEG
+  0 swap <
+;
+
+def FIB 
+    dup #ISNEG ? drop 1 0 - ;
+    dup 1 = ? drop 1 ;
+    dup 0 = ? drop 0 ;
+    dup 1 < ?
+        dup
+        1 swap -
+        #FIB
+        swap
+        2 swap -
+        #FIB
+        +
+    ;
+;

@@ -9,7 +9,7 @@ def DECR
 def FACTORIAL
   dup #ISNEG ? drop 1 0 - ;
   dup 0 = ? drop 1 ;
-  dup 1 < ?
+  dup 1 < ? 
     dup
     #DECR
     #FACTORIAL
@@ -30,5 +30,3 @@ def FACT
   #FACTHELP
   drop OUT
 ;
-
-2 #FACTORIAL .

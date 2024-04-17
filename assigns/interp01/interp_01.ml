@@ -425,7 +425,7 @@ let evaluate (s : stack) (e : env) (t : trace) (p : program) : trace =
     (* IF *)
     | If x :: rest, 0 :: s, e, t -> eval s e t rest
     | If x :: rest, [], e, t -> eval [] e ("panic: stack is empty" :: t) []
-    | If x :: rest, s, e, t -> eval s e t (x @ rest)
+    | If x :: rest, n :: s, e, t -> eval s e t (x @ rest)
     (* CATCH *)
     | _ -> tr
   in eval s e t p
@@ -442,7 +442,7 @@ let interp (s : string) : trace option =
 
 (* UNCOMMENT TO RUN INTERPRETER *)
 
-(*let print_trace t =
+let print_trace t =
   let rec go t =
     match t with
     | [] -> ()
@@ -465,5 +465,5 @@ let main () =
   | None -> print_endline "Parse Error"
   | Some t -> print_trace t
 
-let _ = main ()*)
+let _ = main ()
 
