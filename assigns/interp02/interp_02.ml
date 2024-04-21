@@ -290,6 +290,47 @@ let eval_step (c : stack * env * trace * program) =
   | _ :: _ :: _, _, _, Add :: _ -> panic c "type error (+ on non-integers)"
   | _ :: [], _, _, Add :: _ -> panic c "stack underflow (+ on single)"
   | [], _, _, Add :: _ -> panic c "stack underflow (+ on empty)"
+  (* Multiply *)
+  | Const (Num m) :: Const (Num n) :: s, e, t, Mul :: p -> Const (Num (m + n)) :: s, e, t, p
+  | _ :: _ :: _, _, _, Mul :: _ -> panic c "type error (* on non-integers)"
+  | _ :: [], _, _, Mul :: _ -> panic c "stack underflow (* on single)"
+  | [], _, _, Mul :: _ -> panic c "stack underflow (* on empty)"
+  (* Divide *)
+  | Const (Num m) :: Const (Num n) :: s, e, t, Div :: p when n <> 0 -> Const (Num (m / n)) :: s, e, t, p
+  | Const (Num m) :: Const (Num n) :: s, e, t, Div :: p when n = 0 -> panic c "divide by 0"
+  | _ :: _ :: _, _, _, Div :: _ -> panic c "type error (/ on non-integers)"  
+  | _ :: [], _, _, Div :: _ -> panic c "stack underflow (/ on single)"  
+  | [], _, _, Div :: _ -> panic c "stack underflow (/ on empty)"
+  (* And *)
+  | Const (Bool m) :: Const (Bool n) :: s, e, t, And :: p -> Const (Bool (m && n)) :: s, e, t, p
+  | _ :: _ :: _, _, _, And :: _ -> panic c "type error (&& on non-bool)"
+  | _ :: [], _, _, And :: _ -> panic c "stack underflow (&& on single)"
+  | [], _, _, And :: _ -> panic c "stack underflow (&& on empty)"  
+  (* Or *)
+  | Const (Bool m) :: Const (Bool n) :: s, e, t, Or :: p -> Const (Bool (m || n)) :: s, e, t, p
+  | _ :: _ :: _, _, _, Or :: _ -> panic c "type error (|| on non-bool)"
+  | _ :: [], _, _, Or :: _ -> panic c "stack underflow (|| on single)"
+  | [], _, _, Or :: _ -> panic c "stack underflow (|| on empty)"  
+  (* Not *)
+  | Const (Bool m) :: s, e, t, Not :: p -> Const (Bool (not m)) :: s, e, t, p
+  | _ :: _, _, _, Not :: p -> panic c "type error (~ on non-bool)"
+  | [], _, _, Not :: _ -> panic c "stack underflow (~ on empty)"  
+  (* Less Than *)
+  | Const (Num m) :: Const (Num n) :: s, e, t, Lt :: p -> Const (Bool (n < m)) :: s, e, t, p
+  | _ :: _ :: _, _, _, Lt :: _ -> panic c "type error (< on non-integers)"
+  | _ :: [], _, _, Lt :: _ -> panic c "stack underflow (< on single)"
+  | [], _, _, Lt :: _ -> panic c "stack underflow (< on empty)"    
+  (* Equals *)
+  | Const (Num m) :: Const (Num n) :: s, e, t, Eq :: p -> Const (Bool (n = m)) :: s, e, t, p
+  | _ :: _ :: _, _, _, Eq :: _ -> panic c "type error (= on non-integers)"
+  | _ :: [], _, _, Eq :: _ -> panic c "stack underflow (= on single)"
+  | [], _, _, Eq :: _ -> panic c "stack underflow (= on empty)"
+  (* If-Else *)
+  | Const (Bool m) :: s, e, t, If (i, el) :: p when m = true -> s, e, t, i @ p
+  | Const (Bool m) :: s, e, t, If (i, el) :: p when m = false -> s, e, t, el @ p   
+  | _ :: _, _, _, If (_, _) :: p -> panic c "type error (? p1 ; p2 ; on non-bool)"
+  | [], _, _, If (_, _) :: p -> panic c "stack underflow (? p1 ; p2 ; on empty)"
+  
   | _ -> assert false (* TODO *)
 
 let rec eval c =
