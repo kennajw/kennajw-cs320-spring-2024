@@ -452,7 +452,7 @@ let print_trace t =
   in go (List.rev t)
 
 
-let main () =
+(*let main () =
   let input =
     let rec get_input s =
       try
@@ -465,5 +465,5 @@ let main () =
   | None -> print_endline "Parse Error"
   | Some t -> print_trace t
 
-let _ = main ()
+let _ = main ()*)
 

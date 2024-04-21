@@ -183,11 +183,54 @@ let parse_comment =
 let parse_debug =
   char '"' >> many (satisfy ((<>) '"')) << char '"' >|= implode
 
+let parse_add =
+  char '+' >| Add
+
+let parse_mul =
+  char '*'  >| Mul
+
+let parse_div =
+  char '/' >| Div
+
+let parse_and =
+  str "&&" >| And
+
+let parse_or =
+  str "||" >| Or
+
+let parse_not =
+  char '~' >| Not
+
+let parse_lt =
+  char '<' >| Lt
+
+let parse_eq =
+  char '=' >| Eq
+
+let parse_call =
+  char '#' >| Call
+
+let parse_trace =
+  char '.' >| Trace
+
+let parse_symbol =
+  parse_add <|> parse_mul <|> parse_div <|> parse_and <|> parse_or <|> parse_not <|> parse_lt <|> parse_eq <|> parse_call <|> parse_trace
+
+let parse_bind =
+  keyword "|>" >> parse_ident >|= fun s -> Bind s
+
+let parse_ret =
+  str "Return" >| Return
+
 let ws = many (ws >> parse_comment) >> ws
 let keyword w = str w << ws
 
 let rec parse_com () =
-  let parse_fun = fail (* TODO *)
+  let parse_fun = 
+    let* _ = keyword ":" in
+    let* body = parse_prog_rec () in
+    let* _ = char ';' in
+    pure (Fun (body))
   in
   let parse_if =
     let* _ = keyword "?" in
@@ -212,6 +255,11 @@ let rec parse_com () =
     ; parse_if
     ; parse_ident >|= (fun s -> Fetch s)
     ; parse_debug >|= (fun s -> Debug s)
+    ; parse_bool >|= (fun b -> Push (Bool b))
+    ; parse_int >|= (fun n -> Push (Num n))
+    ; parse_symbol
+    ; parse_bind
+    ; parse_ret
     ]
 and parse_prog_rec () =
   many (rec_parser parse_com << ws)
