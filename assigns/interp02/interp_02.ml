@@ -292,7 +292,9 @@ let eval_step (c : stack * env * trace * program) =
   match c with
   (* Push *)
   | s, e, t, Push c :: p -> Const c :: s, e, t, p
-  | s, e, t, Fun q :: p -> assert false
+  | s, e, t, Fun q :: p -> Clos {def_id = (local_id e) - 1; captured = []; prog = q} :: s, e, t, p
+  (* Debug *)
+  | s, e, t, Debug d :: p -> s, e, d :: t, p
   (* Trace *)
   | v :: s, e, t, Trace :: p -> s, e, to_string v :: t, p
   | [], _, _, Trace :: _ -> panic c "stack underflow (. on empty)"
@@ -342,7 +344,7 @@ let eval_step (c : stack * env * trace * program) =
   | _ :: _, _, _, If (_, _) :: p -> panic c "type error (? p1 ; p2 ; on non-bool)"
   | [], _, _, If (_, _) :: p -> panic c "stack underflow (? p1 ; p2 ; on empty)"
   (* While *)
-  | s, e, t, While (x, y) :: p -> s, e, t, x @ [If (y @ [While (x, y)], p)]
+  | s, e, t, While (x, y) :: p -> s, e, t, x @ [If (y @ [While (x, y)] @ p, p)]
   (* Fetch *)
   | s, e, t, Fetch m :: p -> 
     (match fetch_env e m with
@@ -354,18 +356,26 @@ let eval_step (c : stack * env * trace * program) =
   (* Call *)
   | Clos x :: s, e, t, Call :: p -> 
     (match e with
-    | Global b -> s, Local ({id = 1; local = x.captured; called_def_id = 0; return_prog = p}, e), t, x.prog
-    | Local (r, en) -> s, Local ({id = (r.id + 1); local = x.captured; called_def_id = r.id; return_prog = p}, e), t, x.prog)
+    | Global b -> s, Local ({id = (local_id e) + 1; local = x.captured; called_def_id = 0; return_prog = p}, e), t, x.prog
+    | Local (r, en) -> s, Local ({id = ((local_id e) + 1); local = x.captured; called_def_id = local_id e; return_prog = p}, e), t, x.prog)
   | _ :: _, _, _, Call :: p -> panic c "type error (# on non-closure)"
   | [], _, _, Call :: p -> panic c "stack underflow (# on empty)"
   (* Return *)
-  | x :: [], e (* how to add Clos???? *), t, Return :: p -> assert false
-  | [], e, t, Return :: p -> assert false
-  | [], e, t, [] -> assert false
+  | x :: [], e, t, Return :: p -> 
+    (match e with
+    | Global b -> assert false
+    | Local (r, en) -> x :: [], en, t, r.return_prog)
+  | [], e, t, Return :: p -> 
+    (match e with
+    | Global b -> assert false
+    | Local (r, en) -> [], en, t, r.return_prog)
+  | [], e, t, [] -> 
+    (match e with
+    | Global b -> assert false
+    | Local (r, en) -> [], en, t, r.return_prog)
+  | s, Global _, _, Return :: p -> panic c "cannot return"
   | x :: y :: s, _, _, Return :: p -> panic c "cannot return"
   | x :: s, _, _, [] -> panic c "cannot return"
-  | s, Global b, _, Return :: p -> panic c "cannot return"
-  | _ -> assert false (* TODO *)
 
 let rec eval c =
   match c with
@@ -399,6 +409,6 @@ let main () =
   | None -> print_endline "Parse Error"
   | Some t -> print_trace t
 
-(* let _ = main () *)
+let _ = main ()
 
 (* END OF FILE *)
