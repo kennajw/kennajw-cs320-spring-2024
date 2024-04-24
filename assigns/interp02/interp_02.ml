@@ -234,11 +234,11 @@ let rec parse_com () =
   in
   let parse_if =
     let* _ = keyword "?" in
-    let* ifc = parse_prog_rec () in
+    let* ifx = parse_prog_rec () in
     let* _ = keyword ";" in
-    let* elsec = parse_prog_rec () in
+    let* elsey = parse_prog_rec () in
     let* _ = char ';' in
-    pure (If (ifc, elsec))
+    pure (If (ifx, elsey))
   in
   let parse_while =
     let* _ = keyword "While" in
@@ -269,9 +269,19 @@ let parse_prog = parse (ws >> parse_prog_rec ())
 (* FETCHING AND UPDATING *)
 
 (* fetch the value of `x` in the environment `e` *)
-let fetch_env e x = None (* TODO *)
+let rec fetch_env e x = 
+  match e with
+  | Local (r, en) -> 
+    (match List.assoc_opt x r.local with
+    | Some (v) -> Some (v)
+    | None -> fetch_env en x)
+  | Global b -> 
+    (try Some (List.assoc x b) with Not_found -> None)
 
-let rec update_env e x v = Global [] (* TODO *)
+let rec update_env e x v = 
+  match e with
+  | Local (r, en) -> Local ({r with local = (x, v) :: List.remove_assoc x r.local }, en)
+  | Global b -> Global ((x, v) :: List.remove_assoc x b)
 
 (* EVALUTION *)
 
@@ -282,6 +292,7 @@ let eval_step (c : stack * env * trace * program) =
   match c with
   (* Push *)
   | s, e, t, Push c :: p -> Const c :: s, e, t, p
+  | s, e, t, Fun q :: p -> assert false
   (* Trace *)
   | v :: s, e, t, Trace :: p -> s, e, to_string v :: t, p
   | [], _, _, Trace :: _ -> panic c "stack underflow (. on empty)"
@@ -291,7 +302,7 @@ let eval_step (c : stack * env * trace * program) =
   | _ :: [], _, _, Add :: _ -> panic c "stack underflow (+ on single)"
   | [], _, _, Add :: _ -> panic c "stack underflow (+ on empty)"
   (* Multiply *)
-  | Const (Num m) :: Const (Num n) :: s, e, t, Mul :: p -> Const (Num (m + n)) :: s, e, t, p
+  | Const (Num m) :: Const (Num n) :: s, e, t, Mul :: p -> Const (Num (m * n)) :: s, e, t, p
   | _ :: _ :: _, _, _, Mul :: _ -> panic c "type error (* on non-integers)"
   | _ :: [], _, _, Mul :: _ -> panic c "stack underflow (* on single)"
   | [], _, _, Mul :: _ -> panic c "stack underflow (* on empty)"
@@ -316,7 +327,7 @@ let eval_step (c : stack * env * trace * program) =
   | _ :: _, _, _, Not :: p -> panic c "type error (~ on non-bool)"
   | [], _, _, Not :: _ -> panic c "stack underflow (~ on empty)"  
   (* Less Than *)
-  | Const (Num m) :: Const (Num n) :: s, e, t, Lt :: p -> Const (Bool (n < m)) :: s, e, t, p
+  | Const (Num m) :: Const (Num n) :: s, e, t, Lt :: p -> Const (Bool (m < n)) :: s, e, t, p
   | _ :: _ :: _, _, _, Lt :: _ -> panic c "type error (< on non-integers)"
   | _ :: [], _, _, Lt :: _ -> panic c "stack underflow (< on single)"
   | [], _, _, Lt :: _ -> panic c "stack underflow (< on empty)"    
@@ -330,7 +341,30 @@ let eval_step (c : stack * env * trace * program) =
   | Const (Bool m) :: s, e, t, If (i, el) :: p when m = false -> s, e, t, el @ p   
   | _ :: _, _, _, If (_, _) :: p -> panic c "type error (? p1 ; p2 ; on non-bool)"
   | [], _, _, If (_, _) :: p -> panic c "stack underflow (? p1 ; p2 ; on empty)"
-  
+  (* While *)
+  | s, e, t, While (x, y) :: p -> s, e, t, x @ [If (y @ [While (x, y)], p)]
+  (* Fetch *)
+  | s, e, t, Fetch m :: p -> 
+    (match fetch_env e m with
+    | Some v -> v :: s, e, t, p
+    | None -> panic c "fetch failed")
+  (* Assign *)
+  | m :: s, e, t, Bind x :: p -> s, (update_env e x m), t, p
+  | [], _, _, Bind m :: p -> panic c "stack underflow (|> x on empty)"
+  (* Call *)
+  | Clos x :: s, e, t, Call :: p -> 
+    (match e with
+    | Global b -> s, Local ({id = 1; local = x.captured; called_def_id = 0; return_prog = p}, e), t, x.prog
+    | Local (r, en) -> s, Local ({id = (r.id + 1); local = x.captured; called_def_id = r.id; return_prog = p}, e), t, x.prog)
+  | _ :: _, _, _, Call :: p -> panic c "type error (# on non-closure)"
+  | [], _, _, Call :: p -> panic c "stack underflow (# on empty)"
+  (* Return *)
+  | x :: [], e (* how to add Clos???? *), t, Return :: p -> assert false
+  | [], e, t, Return :: p -> assert false
+  | [], e, t, [] -> assert false
+  | x :: y :: s, _, _, Return :: p -> panic c "cannot return"
+  | x :: s, _, _, [] -> panic c "cannot return"
+  | s, Global b, _, Return :: p -> panic c "cannot return"
   | _ -> assert false (* TODO *)
 
 let rec eval c =
