@@ -276,7 +276,9 @@ let rec fetch_env e x =
     | Some (v) -> Some (v)
     | None -> fetch_env en x)
   | Global b -> 
-    (try Some (List.assoc x b) with Not_found -> None)
+    (match List.assoc_opt x b with
+    | Some (v) -> Some (v)
+    | None -> None)
 
 let rec update_env e x v = 
   match e with
