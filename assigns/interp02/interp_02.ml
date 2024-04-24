@@ -340,7 +340,7 @@ let eval_step (c : stack * env * trace * program) =
   | [], _, _, Eq :: _ -> panic c "stack underflow (= on empty)"
   (* If-Else *)
   | Const (Bool m) :: s, e, t, If (i, el) :: p when m = true -> s, e, t, i @ p
-  | Const (Bool m) :: s, e, t, If (i, el) :: p when m = false -> s, e, t, el @ p   
+  | Const (Bool m) :: s, e, t, If (i, el) :: p when m = false -> s, e, t, el @ p    
   | _ :: _, _, _, If (_, _) :: p -> panic c "type error (? p1 ; p2 ; on non-bool)"
   | [], _, _, If (_, _) :: p -> panic c "stack underflow (? p1 ; p2 ; on empty)"
   (* While *)
