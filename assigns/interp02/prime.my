@@ -26,4 +26,4 @@
 ; |> is_prime
 
 "Is 2 prime? (yes):"
-1 is_prime # .
+17 is_prime # .
