@@ -510,7 +510,30 @@ type lexpr
   | App of lexpr * lexpr
   | Trace of lexpr
 
-let desugar (p : top_prog) : lexpr = Unit (* TODO *)
+let rec first_rule (p : top_prog) : expr =
+  match p with 
+  | [] -> Unit
+  | (i, l, e) :: rest -> App (Fun ([i], first_rule rest), Fun (l, e))
+let rec desugar_fun (ls : ident list) (r : lexpr) : lexpr =
+  match ls with
+  | x :: xs -> Fun (x, desugar_fun xs r)
+  | [] -> r
+let rec desugar_expr (e : expr) : lexpr =
+  match e with
+  | Unit -> Unit
+  | Num n -> Num n
+  | Bool b -> Bool b
+  | Var i -> Var i
+  | Uop (u, ex) -> Uop (u, desugar_expr ex)
+  | Bop (b, ex, exx) -> Bop (b, desugar_expr ex, desugar_expr exx)
+  | Trace ex -> Trace (desugar_expr ex)
+  | Ife (ex, exx, exxx) -> Ife (desugar_expr ex, desugar_expr exx, desugar_expr exxx)
+  | App (x, y) -> App (desugar_expr x, desugar_expr y)
+  | Fun (l, ex) -> desugar_fun l (desugar_expr ex)
+  | Let (i, l, ex, exx) -> App ((Fun (i, desugar_expr exx)), desugar_fun l (desugar_expr ex))
+let desugar (p : top_prog) : lexpr = 
+  let e = first_rule p in
+  desugar_expr e
 let translate (e : lexpr) : stack_prog = [] (* TODO *)
 let serialize (p : stack_prog) : string = "" (* TODO *)
 
