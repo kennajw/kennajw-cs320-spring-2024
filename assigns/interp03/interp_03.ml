@@ -534,7 +534,40 @@ let rec desugar_expr (e : expr) : lexpr =
 let desugar (p : top_prog) : lexpr = 
   let e = first_rule p in
   desugar_expr e
-let translate (e : lexpr) : stack_prog = [] (* TODO *)
+
+let rec translate (e : lexpr) : stack_prog =
+  match e with
+  | Unit -> [Push (Unit)]
+  | Num n -> [Push (Num n)]
+  | Bool b -> [Push (Bool b)]
+  | Var x -> [Lookup x]
+  | Trace p -> 
+    translate p @ [Trace]
+  | Uop (u, p) ->
+    (match u with
+    | Not -> 
+      (match translate p with
+      | [Push (Bool true)] -> [Push (Bool false)]
+      | [Push (Bool false)] -> [Push (Bool true)]
+      | _ -> assert false)
+    | Neg -> assert false)
+  | Bop (b, p, pr) ->
+    (match b with
+    | Add -> translate p @ translate pr @ [Add]
+    | Sub -> translate p @ translate pr @ [Sub]
+    | Mul -> translate p @ translate pr @ [Mul]
+    | Div -> translate p @ translate pr @ [Div]
+    | And -> assert false
+    | Or -> assert false
+    | Lt -> translate p @ translate pr @ [Lt]
+    | Lte -> assert false
+    | Gt -> assert false
+    | Gte -> assert false
+    | Eq -> assert false
+    | Neq -> assert false)
+  | Ife (i, th, el) -> assert false
+  | Fun (i, p) -> [Fun (i, translate p)]
+  | App (p, pr) -> translate p @ translate pr
 let serialize (p : stack_prog) : string = "" (* TODO *)
 
 let compile (s : string) : string option =
