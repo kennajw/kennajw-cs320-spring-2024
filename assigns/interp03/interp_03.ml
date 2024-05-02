@@ -534,41 +534,69 @@ let rec desugar_expr (e : expr) : lexpr =
 let desugar (p : top_prog) : lexpr = 
   let e = first_rule p in
   desugar_expr e
-
 let rec translate (e : lexpr) : stack_prog =
   match e with
   | Unit -> [Push (Unit)]
   | Num n -> [Push (Num n)]
   | Bool b -> [Push (Bool b)]
   | Var x -> [Lookup x]
-  | Trace p -> 
-    translate p @ [Trace]
-  | Uop (u, p) ->
-    (match u with
-    | Not -> 
-      (match translate p with
-      | [Push (Bool true)] -> [Push (Bool false)]
-      | [Push (Bool false)] -> [Push (Bool true)]
-      | _ -> assert false)
-    | Neg -> assert false)
+  | Trace p -> translate p @ [Trace; Push (Unit)]
   | Bop (b, p, pr) ->
     (match b with
-    | Add -> translate p @ translate pr @ [Add]
-    | Sub -> translate p @ translate pr @ [Sub]
-    | Mul -> translate p @ translate pr @ [Mul]
-    | Div -> translate p @ translate pr @ [Div]
-    | And -> assert false
-    | Or -> assert false
-    | Lt -> translate p @ translate pr @ [Lt]
-    | Lte -> assert false
-    | Gt -> assert false
-    | Gte -> assert false
-    | Eq -> assert false
-    | Neq -> assert false)
-  | Ife (i, th, el) -> assert false
-  | Fun (i, p) -> [Fun (i, translate p)]
-  | App (p, pr) -> translate p @ translate pr
-let serialize (p : stack_prog) : string = "" (* TODO *)
+    | Add -> translate pr @ [Push (Num 0); Add] @ translate p @ [Add]
+    | Sub -> translate pr @ [Push (Num 0); Add] @ translate p @ [Sub]
+    | Mul -> translate pr @ [Push (Num 0); Add] @ translate p @ [Mul]
+    | Div -> translate pr @ [Push (Num 0); Add] @ translate p @ [Div]
+    | And -> translate p @ [If ((translate pr) @ [If ([Push (Bool true)], [Push (Bool false)])], [Push (Bool false)])] 
+    | Or -> translate p @ [If ([Push (Bool true)], translate pr @ [If ([Push (Bool true)], [Push (Bool false)])])]
+    | Lt -> translate pr @ [Push (Num 0); Add] @ translate p @ [Lt]
+    | Lte -> translate pr @ [Push (Num 0); Add] @ translate p @ [Swap; Lt; If ([Push (Bool false)], [Push (Bool true)])]
+    | Gt -> translate pr @ [Push (Num 0); Add] @ translate p @ [Swap; Lt; If ([Push (Bool true)], [Push (Bool false)])]
+    | Gte -> translate pr @ [Push (Num 0); Add] @ translate p @ [Lt; If ([Push (Bool false)], [Push (Bool true)])]
+    | Eq -> translate pr @ [Push (Num 0); Add] @ translate p @ [Lt; If ([Push (Bool false)], translate pr @ translate p @ [Swap; Lt; If ([Push (Bool false)], [Push (Bool true)])])] 
+    | Neq -> translate pr @ [Push (Num 0); Add] @ translate p @ [Lt; If ([Push (Bool true)], translate pr @ translate p @ [Swap; Lt; If ([Push (Bool true)], [Push (Bool false)])])])
+  | Uop (u, p) ->
+    (match u with
+    | Not -> translate p @ [If ([Push (Bool false)], [Push (Bool true)])]
+    | Neg -> translate p @ [Push (Num 0); Sub])
+  | Ife (i, th, el) -> translate i @ [If (translate th, translate el)]
+  | Fun (i, p) -> [Fun ("C", [Swap; Assign i] @ translate p @ [Swap; Return])]
+  | App (p, pr) -> translate pr @ translate p @ [Call]
+
+let rec fun_name (c : char list) =
+  match c with
+  | '_' :: rest -> fun_name rest
+  | x :: rest -> x :: fun_name rest
+  | [] -> []
+
+let rec serialize (p : stack_prog) : string =
+  match p with
+  | Trace :: rest -> "\n trace " ^ serialize rest
+  | Swap :: rest -> "swap " ^ serialize rest
+  | Push n :: rest -> 
+    (match n with
+    | Num n -> "push " ^ (string_of_int n) ^ " " ^ serialize rest
+    | Bool b -> "push " ^ (string_of_bool b) ^ " " ^ serialize rest
+    | Unit -> "push unit \n " ^ serialize rest)
+  | Add :: rest -> "add " ^ serialize rest
+  | Sub :: rest -> "sub " ^ serialize rest
+  | Mul :: rest -> "mul " ^ serialize rest
+  | Div :: rest -> "div " ^ serialize rest
+  | Lt :: rest -> "lt " ^ serialize rest
+  | If (p, pr) :: rest -> "if " ^ serialize p ^ " else " ^ serialize pr ^ " end \n " ^ serialize rest
+  | Lookup i :: rest -> 
+    (match i with 
+    | "_" -> "lookup SLAY " ^ serialize rest 
+    | _ -> "lookup A" ^ String.uppercase_ascii (implode (fun_name (explode i))) ^  " " ^ serialize rest)
+  | Assign i :: rest -> 
+    (match i with 
+    | "_" -> "assign SLAY \n" ^ serialize rest 
+    | _ -> "assign A" ^ String.uppercase_ascii (implode (fun_name (explode i))) ^ " \n" ^ serialize rest)
+  | Fun (i, p) :: rest -> "fun " ^ i ^ " begin " ^ serialize p ^ "end \n " ^ serialize rest 
+  | Return :: rest -> "return \n " ^ serialize rest
+  | Call :: rest -> "call " ^ serialize rest
+  | [] -> ""
+
 
 let compile (s : string) : string option =
   match parse_top_prog s with
